@@ -39,7 +39,7 @@ def read_root():
     return {"Hello": "World"}
 
 @app.post("/signup")
-def sign_up(username: str = Body(...), email: str = Body(...), password: str = Body(...)):
+def sign_up(username: str = Body(...), password: str = Body(...)):
     with app.state.db.session() as session:
         user = session.query(User).filter(User.username == username).first()
         if user:
