@@ -23,7 +23,7 @@ function TextPreview() {
       : null }
       { editing ? null :
       <article
-        className="w-full max-w-full prose p-8 transition duration-500 hover:bg-gray-100"
+        className="w-full rounded-2xl max-w-full prose p-8 transition duration-500 hover:bg-gray-100"
         onClick={() => setEditing(true)}
       >
         <Markdown>{content}</Markdown>

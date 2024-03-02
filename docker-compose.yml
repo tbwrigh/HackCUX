@@ -14,7 +14,7 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - nwhacks-db-volume:/var/lib/postgresql/data
+      - hackcu-database:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=password
       - POSTGRES_USER=postgres
@@ -32,6 +32,25 @@ services:
       watch:
         - action: rebuild
           path: ./backend/alembic/
+  qdrant:
+    container_name: qdrant
+    image: qdrant/qdrant
+    ports:
+      - 6333:6333
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:6333/"]
+      interval: 30s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    volumes:
+      - hackcu-qdrant:/qdrant
+    profiles:
+      - local
+    develop:
+      watch:
+        - action: rebuild
+          path: ./qdrant/
   backend: 
     container_name: backend
     build: 
@@ -48,8 +67,13 @@ services:
     depends_on:
       migration:
         condition: service_completed_successfully
+      qdrant:
+        condition: service_healthy
     develop:
       watch:
         - action: rebuild
           path: ./backend/
     
+volumes:
+  hackcu-database:
+  hackcu-qdrant:
