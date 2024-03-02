@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import Markdown from 'react-markdown'
+import rehypeMathjax from 'rehype-mathjax'
+import remarkMath from 'remark-math'
 import './App.css'
 
 function TextPreview() {
@@ -26,7 +28,7 @@ function TextPreview() {
         className="w-full rounded-2xl max-w-full prose p-8 transition duration-500 hover:bg-gray-100"
         onClick={() => setEditing(true)}
       >
-        <Markdown>{content}</Markdown>
+        <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeMathjax]}>{content}</Markdown>
       </article>
       }
     </div>
