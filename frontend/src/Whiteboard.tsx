@@ -1,10 +1,12 @@
-import { useState, useEffect, useLayoutEffect, useRef, createRef } from 'react'
+import { useState, useEffect, useLayoutEffect, useRef, createRef, useCallback } from 'react'
 import React from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
-import './QueryApp.css'
+import './App.css'
 import './Wobject.tsx'
+import './WhiteboardMenu.tsx'
 import Wobject from './Wobject.tsx'
+import WhiteboardMenu from './WhiteboardMenu.tsx'
 
 interface Wobject {
     x: number;
@@ -20,6 +22,17 @@ interface Wobject {
     ref: React.RefObject<HTMLDivElement>;
 }
 
+export interface CreateWobject {
+    type: string;
+    x: number;
+    y: number;
+}
+
+interface RightClickMenu {
+    x: number;
+    y: number;
+}
+
 type HandlerFunction = (...args: any[]) => void;
 function useMultiClickHandler(handler: Record<number, HandlerFunction>, delay: number = 400) {
     const [state, setState] = useState<{ clicks: number; args: any[] }>({ clicks: 0, args: [] });
@@ -29,6 +42,7 @@ function useMultiClickHandler(handler: Record<number, HandlerFunction>, delay: n
             setState({ clicks: 0, args: [] });
 
             if (state.clicks > 0 && typeof handler[state.clicks] === 'function') {
+                console.log("sjsdhjkdhdhkkdhsj")
                 handler[state.clicks](...state.args);
             }
         }, delay);
@@ -45,9 +59,13 @@ function useMultiClickHandler(handler: Record<number, HandlerFunction>, delay: n
     };
 }
 
-
 const Whiteboard: React.FC = () => {
     const [wobjects, setWobjects] = useState<Wobject[]>([]);
+    const [rightClickMenu, setRightClickMenu] = useState<RightClickMenu | null>(null);
+
+    const [clickTimeout, setClickTimeout] = useState<number | null>(null);
+
+    const [createWobject, setCreateWobject] = useState<CreateWobject | null>(null);
 
     useLayoutEffect(() => {
         if (wobjects.some(wobject => wobject.currentWidth == 0)) {
@@ -75,6 +93,15 @@ const Whiteboard: React.FC = () => {
             ref: React.createRef(),
         }]);
     }
+
+    useEffect(() => {
+        if (createWobject) {
+            createNewWobject(createWobject.x, createWobject.y)
+
+            setRightClickMenu(null);
+            setCreateWobject(null);
+        }
+    }, [createWobject]);
 
     const handleDoubleClick = (e: React.MouseEvent) => {
         createNewWobject(e.clientX, e.clientY);
@@ -109,8 +136,35 @@ const Whiteboard: React.FC = () => {
 
     };
 
+    const handleClick = useCallback((e: React.MouseEvent) => {
+        if (clickTimeout) {
+            clearTimeout(clickTimeout);
+            setClickTimeout(null);
+
+            handleDoubleClick(e);
+        } else {
+            const timeout = setTimeout(() => {
+                if (e.button === 0) {
+                    // Left
+                    setRightClickMenu(null);
+                }
+
+                setClickTimeout(null);
+            }, 150);
+            setClickTimeout(timeout);
+        }
+    }, [clickTimeout]);
+
+    const handleContextMenu = (e: React.MouseEvent) => {
+        e.preventDefault();
+        setRightClickMenu({
+            x: e.clientX,
+            y: e.clientY,
+        });
+    };
+
     return (
-        <div onDoubleClick={handleDoubleClick} onMouseMove={handleDrag} className="w-full h-full">
+        <div onMouseMove={handleDrag} onClick={handleClick} onContextMenu={handleContextMenu} className="w-full h-full">
             {wobjects.map((wobject) => (
                 <div
                     ref={wobject.ref}
@@ -132,6 +186,7 @@ const Whiteboard: React.FC = () => {
                 </div>
             ))
             }
+            {rightClickMenu ? <WhiteboardMenu x={rightClickMenu.x} y={rightClickMenu.y} setCreateWobject={setCreateWobject} /> : <div></div>}
         </div>
     );
 };
