@@ -39,7 +39,7 @@ def read_root():
     return {"Hello": "World"}
 
 @app.post("/signup")
-def sign_up(username: str = Body(...), email: str = Body(...), password: str = Body(...)):
+def sign_up(username: str = Body(...), password: str = Body(...)):
     with app.state.db.session() as session:
         user = session.query(User).filter(User.username == username).first()
         if user:
@@ -47,7 +47,7 @@ def sign_up(username: str = Body(...), email: str = Body(...), password: str = B
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Username already exists",
             )
-        new_user = User(username=username, email=email, password=password)
+        new_user = User(username=username, password=password)
         session.add(new_user)
         session.commit()
 
