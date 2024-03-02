@@ -3,6 +3,8 @@ import React from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './QueryApp.css'
+import './Wobject.tsx'
+import Wobject from './Wobject.tsx'
 
 interface Wobject {
     x: number;
@@ -113,7 +115,6 @@ const Whiteboard: React.FC = () => {
                 <div
                     ref={wobject.ref}
                     key={wobject.id}
-                    draggable={false}
                     onMouseDown={(e) => handleDragStart(e, wobject.id)}
                     onMouseUp={(e) => handleDragEnd(e, wobject.id)}
                     className={`w-full h-screen relative ${wobject.currentWidth == 0 ? 'display-none' : ''}`}
@@ -127,10 +128,11 @@ const Whiteboard: React.FC = () => {
                         top: wobject.y - wobject.currentHeight / 2,
                     }}
                 >
+                    <Wobject></Wobject>
                 </div>
             ))
             }
-        </div >
+        </div>
     );
 };
 
