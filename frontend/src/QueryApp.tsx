@@ -23,9 +23,15 @@ function QueryApp() {
   if (isError) return <div>Error fetching whiteboards!</div>;
 
   return (
-    <div className="w-full h-full">
+    <div className="w-full h-full h-screen">
+    <div className="flex">
+      <div className="flex-none">
       <HamburgerMenu whiteboardMetadatas={whiteboardMetadatas}/>
-      <Whiteboard />
+      </div>
+      <div className="flex-initial">
+        <Whiteboard />
+      </div>
+    </div>
     </div>
   )
 }

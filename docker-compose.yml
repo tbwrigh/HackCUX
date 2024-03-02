@@ -1,8 +1,8 @@
 version: '3.9'
 
 services:
-  database:
-    container_name: database
+  hackcu-postgres:
+    container_name: hackcu-postgres
     image: postgres
     restart: always
     healthcheck:
@@ -14,50 +14,51 @@ services:
     ports:
       - 5432:5432
     volumes:
-      - hackcu-database:/var/lib/postgresql/data
+      - hackcu-database-volume:/var/lib/postgresql/data
     environment:
       - POSTGRES_PASSWORD=password
       - POSTGRES_USER=postgres
       - POSTGRES_DB=postgres=value
-  migration:
-    container_name: migration
+  hackcu-migration:
+    container_name: hackcu-migration
     build: ./backend
     command: alembic upgrade head
     environment:
-      - DATABASE_URL=postgresql://postgres:password@database:5432/postgres
+      - DATABASE_URL=postgresql://postgres:password@hackcu-postgres:5432/postgres
     depends_on:
-      database:
+      hackcu-postgres:
         condition: service_healthy
     develop:
       watch:
         - action: rebuild
           path: ./backend/alembic/
-  qdrant:
-    container_name: qdrant
+  hackcu-qdrant:
+    container_name: hackcu-qdrant
     image: qdrant/qdrant
     ports:
       - 6333:6333
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:6333/"]
-      interval: 30s
-      timeout: 5s
-      retries: 10
-      start_period: 10s
     volumes:
-      - hackcu-qdrant:/qdrant
-    profiles:
-      - local
+      - hackcu-qdrant-volume:/qdrant
     develop:
       watch:
         - action: rebuild
           path: ./qdrant/
-  backend: 
-    container_name: backend
+  hackcu-memcached:
+    container_name: hackcu-memcached
+    image: memcached
+    ports:
+      - 11211:11211
+  hackcu-backend: 
+    container_name: hackcu-backend
     build: 
       context: ./backend
       dockerfile: Dockerfile
     ports:
       - 8000:8000
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@hackcu-postgres:5432/postgres
+      - MEMCACHE_HOST=memcached
+      - MEMCACHE_PORT=11211
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/docs"]
       interval: 30s
@@ -65,15 +66,17 @@ services:
       retries: 10
       start_period: 10s
     depends_on:
-      migration:
+      hackcu-migration:
         condition: service_completed_successfully
-      qdrant:
-        condition: service_healthy
+      hackcu-qdrant:
+        condition: service_started
+      hackcu-memcached:
+        condition: service_started
     develop:
       watch:
         - action: rebuild
           path: ./backend/
     
 volumes:
-  hackcu-database:
-  hackcu-qdrant:
+  hackcu-database-volume:
+  hackcu-qdrant-volume:
