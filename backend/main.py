@@ -47,7 +47,7 @@ def sign_up(username: str = Body(...), password: str = Body(...)):
                 status_code=status.HTTP_409_CONFLICT,
                 detail="Username already exists",
             )
-        new_user = User(username=username, email=email, password=password)
+        new_user = User(username=username, password=password)
         session.add(new_user)
         session.commit()
 
