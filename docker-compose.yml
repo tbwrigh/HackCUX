@@ -51,6 +51,11 @@ services:
       watch:
         - action: rebuild
           path: ./qdrant/
+  memcached:
+    container_name: memcached
+    image: memcached
+    ports:
+      - 11211:11211
   backend: 
     container_name: backend
     build: 
@@ -69,6 +74,8 @@ services:
         condition: service_completed_successfully
       qdrant:
         condition: service_healthy
+      memcached:
+        condition: service_started
     develop:
       watch:
         - action: rebuild
