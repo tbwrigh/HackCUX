@@ -10,7 +10,9 @@ from os import getenv
 import random
 
 from .db import DB
-from .models import User, Whiteboard
+from .models.user import User
+from .models.whiteboard import Whiteboard
+from .models.whiteboard_object import WhiteboardObject
 
 load_dotenv()
 
@@ -116,3 +118,64 @@ def create_whiteboard(name: str, user: dict = Depends(get_authenticated_user_fro
         session.commit()
 
     return {"message": "Whiteboard created successfully"}
+
+@app.delete("/delete_whiteboard/{whiteboard_id}")
+def delete_whiteboard(whiteboard_id: int, user: dict = Depends(get_authenticated_user_from_session_id)):
+    with app.state.db.session() as session:
+        whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
+        if whiteboard is None or whiteboard.user_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Whiteboard not found",
+            )
+        session.delete(whiteboard)
+        session.commit()
+
+    return {"message": "Whiteboard deleted successfully"}
+
+@app.get("/whiteboard_objects/{whiteboard_id}")
+def read_whiteboard_objects(whiteboard_id: int, user: dict = Depends(get_authenticated_user_from_session_id)):
+    with app.state.db.session() as session:
+        whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
+        if whiteboard is None or whiteboard.user_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Whiteboard not found",
+            )
+        whiteboard_objects = session.query(WhiteboardObject).filter(WhiteboardObject.whiteboard_id == whiteboard_id).all()
+        return whiteboard_objects
+    
+@app.post("/new_whiteboard_object/{whiteboard_id}")
+def create_whiteboard_object(whiteboard_id: int, data: dict = Body(...), user: dict = Depends(get_authenticated_user_from_session_id)):
+    with app.state.db.session() as session:
+        whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
+        if whiteboard is None or whiteboard.user_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Whiteboard not found",
+            )
+        whiteboard_object = WhiteboardObject(whiteboard_id=whiteboard_id, creator_id=user.id, data=data)
+        session.add(whiteboard_object)
+        session.commit()
+
+    return {"message": "Whiteboard object created successfully"}
+
+@app.delete("/delete_whiteboard_object/{whiteboard_id}/{object_id}")
+def delete_whiteboard_object(whiteboard_id: int, object_id: int, user: dict = Depends(get_authenticated_user_from_session_id)):
+    with app.state.db.session() as session:
+        whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
+        if whiteboard is None or whiteboard.user_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Whiteboard not found",
+            )
+        whiteboard_object = session.query(WhiteboardObject).filter(WhiteboardObject.id == object_id).first()
+        if whiteboard_object is None or whiteboard_object.whiteboard_id != whiteboard_id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Whiteboard object not found",
+            )
+        session.delete(whiteboard_object)
+        session.commit()
+
+    return {"message": "Whiteboard object deleted successfully"}
