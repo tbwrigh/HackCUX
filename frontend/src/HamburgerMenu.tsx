@@ -7,31 +7,53 @@ interface HamburgerMenuProps {
   whiteboardMetadatas: WhiteboardMetadata[]; // Array of MenuItem objects
 }
 
-function HamburgerMenu({whiteboardMetadatas}: HamburgerMenuProps) {
-    const [isOpen, setIsOpen] = useState(false);
+function HamburgerMenu({ whiteboardMetadatas }: HamburgerMenuProps) {
+  const [isOpen, setIsOpen] = useState(false);
 
-    const toggleMenu = () => {
-      setIsOpen(!isOpen);
-    };
-  
-    return (
-      <>
-        <div className="app">
-        <div className={`menu-toggle ${isOpen ? 'open' : ''}`} onClick={toggleMenu}>
-          <div className="hamburger"></div>
+  const toggleMenu = () => {
+    setIsOpen(!isOpen);
+  };
+
+
+  /*
+  return (
+    <>
+      <div className="app">
+      <div className={`menu-toggle ${isOpen ? 'open' : ''}`} onClick={toggleMenu}>
+        <div className="hamburger"></div>
+      </div>
+      <div className={`menu ${isOpen ? 'open' : ''}`}>
+          <div className='menu_items'>
+              <ul>
+                  {whiteboardMetadatas.map(item => (
+                      <WhiteboardItem key={item.id} label={item.name} />
+                  ))}
+              </ul>
+          </div>
+      </div>
+    </div>
+    </>
+  )
+  */
+
+  return (
+    <>
+      <div>
+        <div className={`${isOpen ? '' : 'display-none'}`} onClick={toggleMenu}>
+          <i className="large material-icons">menu</i>
         </div>
-        <div className={`menu ${isOpen ? 'open' : ''}`}>
-            <div className='menu_items'>
-                <ul>
-                    {whiteboardMetadatas.map(item => (
-                        <WhiteboardItem key={item.id} label={item.name} />
-                    ))}
-                </ul>
-            </div>
+        <div className={`${isOpen ? '' : 'display-none'}`}>
+          <div>
+            <ul>
+              {whiteboardMetadatas.map(item => (
+                <WhiteboardItem key={item.id} label={item.name} />
+              ))}
+            </ul>
+          </div>
         </div>
       </div>
-      </>
-    )
+    </>
+  )
 }
 
 export default HamburgerMenu

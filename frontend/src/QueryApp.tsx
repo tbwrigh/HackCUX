@@ -6,7 +6,7 @@ import HamburgerMenu from './HamburgerMenu.tsx'
 import TextPreview from './TextPreview.tsx'
 import Whiteboard from "./whiteboard.tsx"
 import { useQuery, QueryKey, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import {WhiteboardMetadata} from './WhiteboardMetadata.ts';
+import { WhiteboardMetadata } from './WhiteboardMetadata.ts';
 
 function QueryApp() {
 
@@ -19,19 +19,17 @@ function QueryApp() {
       ),
   })
 
-  if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error fetching whiteboards!</div>;
+  //if (isLoading) return <div>Loading...</div>;
+  //if (isError) return <div>Error fetching whiteboards!</div>;
 
   return (
-    <div className="w-full h-full h-screen">
-    <div className="flex">
+    <div className="w-full h-full h-screen flex flex-row">
       <div className="flex-none">
-      <HamburgerMenu whiteboardMetadatas={whiteboardMetadatas}/>
+        {/*<HamburgerMenu whiteboardMetadatas={whiteboardMetadatas} />*/}
       </div>
-      <div className="flex-initial">
+      <div className="w-full flex-1">
         <Whiteboard />
       </div>
-    </div>
     </div>
   )
 }
