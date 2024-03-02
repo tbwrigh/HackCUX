@@ -1,19 +1,18 @@
 import { useState } from 'react'
 import './HamburgerMenu.css'
 import WhiteboardItem from './WhiteboardItem';
+import { WhiteboardMetadata } from './WhiteboardMetadata';
 
-function HamburgerMenu() {
+interface HamburgerMenuProps {
+  whiteboardMetadatas: WhiteboardMetadata[]; // Array of MenuItem objects
+}
+
+function HamburgerMenu({whiteboardMetadatas}: HamburgerMenuProps) {
     const [isOpen, setIsOpen] = useState(false);
 
     const toggleMenu = () => {
       setIsOpen(!isOpen);
     };
-
-    const whiteboardItems = [
-        { id: 1, label: 'Whiteboard 1' },
-        { id: 2, label: 'Whiteboard 2' },
-        { id: 3, label: 'Whiteboard 3' }
-    ];
   
     return (
       <>
@@ -24,8 +23,8 @@ function HamburgerMenu() {
         <div className={`menu ${isOpen ? 'open' : ''}`}>
             <div className='menu_items'>
                 <ul>
-                    {whiteboardItems.map(item => (
-                        <WhiteboardItem key={item.id} label={item.label} />
+                    {whiteboardMetadatas.map(item => (
+                        <WhiteboardItem key={item.id} label={item.name} />
                     ))}
                 </ul>
             </div>

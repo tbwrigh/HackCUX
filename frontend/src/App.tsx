@@ -1,21 +1,13 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
-import HamburgerMenu from './HamburgerMenu'
-import TextPreview from './TextPreview.tsx'
+import { QueryClient, QueryClientProvider, useQuery } from '@tanstack/react-query';
+import QueryApp from './QueryApp.tsx'
 
-import Whiteboard from "./whiteboard.tsx"
+const queryClient = new QueryClient();
 
-function App() {
-  const [count, setCount] = useState(0)
+export default function App() {
 
-  return (
-    <div className="w-full h-full">
-      <HamburgerMenu />
-      <Whiteboard />
-    </div>
-  )
+   return (
+     <QueryClientProvider client={queryClient}>
+       <QueryApp />
+     </QueryClientProvider>
+   )
 }
-
-export default App
