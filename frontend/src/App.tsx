@@ -11,9 +11,15 @@ function App() {
   const [count, setCount] = useState(0)
 
   return (
-    <div className="w-full h-full">
-      <HamburgerMenu />
-      <Whiteboard />
+    <div className="w-full h-full h-screen">
+      <div className="flex">
+        <div className="flex-none">
+          <HamburgerMenu />
+        </div>
+        <div className="flex-initial">
+          <Whiteboard />
+        </div>
+      </div>
     </div>
   )
 }
