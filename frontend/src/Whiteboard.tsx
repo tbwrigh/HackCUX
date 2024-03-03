@@ -4,13 +4,18 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import './CreateWobjectMenu.tsx'
+import { useQuery, QueryKey, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 import Wobject from './Wobject.tsx'
 import WhiteboardMenu from './CreateWobjectMenu.tsx'
 
 import CodeWobject from './wobjects/Code.tsx'
 
+import LoadingElement from './Loading.tsx'
+
 import { CreatedWobject, WobjectTypes } from './wobjects/Wobject.ts'
+
+import { WhiteboardMetadata } from './api/ApiTypes.ts'
 
 interface Wobject {
     type: string,
@@ -88,7 +93,11 @@ const EnsureMaximumSizeWobject = (w: number, h: number) => {
     return [w, h];
 };
 
-const Whiteboard: React.FC = () => {
+interface WhiteboardProps {
+    id: number | undefined;
+}
+
+function Whiteboard(props: WhiteboardProps) {
     const [wobjects, setWobjects] = useState<Wobject[]>([]);
     const [rightClickMenu, setRightClickMenu] = useState<RightClickMenu | null>(null);
 
@@ -97,6 +106,13 @@ const Whiteboard: React.FC = () => {
     const [createdWobject, setCreatedWobject] = useState<CreatedWobject | null>(null);
 
     const backPanel = useRef<HTMLDivElement>(null);
+
+    //const { isLoading, isError, data } = useQuery<boolean, boolean, WhiteboardMetadata[]>({
+    //    queryKey: ['GET', 'whiteboards'],
+    //});
+    //
+    //if (isLoading) return <LoadingElement />
+    //if (data == undefined || isError) return <div>Error fetching whiteboards!</div>;
 
     useLayoutEffect(() => {
         if (wobjects.some(wobject => wobject.currentWidth == 0)) {

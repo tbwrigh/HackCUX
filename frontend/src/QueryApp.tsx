@@ -5,7 +5,7 @@ import './App.css'
 import HamburgerMenu from './HamburgerMenu.tsx'
 import Whiteboard from "./Whiteboard.tsx"
 import { useQuery, QueryKey, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { WhiteboardMetadata } from './WhiteboardMetadata.ts';
+import { WhiteboardMetadata } from './api/ApiTypes.ts'
 import ToolsSidebar from './ToolsSidebar.tsx'
 import { useCookies } from 'react-cookie'
 import AddWhiteboardPopup from './AddWhiteboardPopup.tsx'
@@ -80,7 +80,7 @@ function QueryApp() {
             <HamburgerMenu whiteboardMetadatas={data} setIsPopupOpen={setIsPopupOpen} setSelectedWhiteboardID={setSelectedWhiteboardID} />
           </div>
           <div className="w-full h-full flex-1">
-            <Whiteboard />
+            <Whiteboard id={0} />
           </div>
         </div>}
     </div>
