@@ -74,6 +74,22 @@ services:
       watch:
         - action: rebuild
           path: ./backend/
+  hackcu-frontend:
+    container_name: hackcu-frontend
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - 3000:3000
+    env_file:
+      - frontend.env
+    depends_on:
+      hackcu-backend:
+        condition: service_healthy
+    develop:
+      watch:
+        - action: rebuild
+          path: ./frontend/
     
 volumes:
   hackcu-database-volume:

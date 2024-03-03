@@ -115,7 +115,7 @@ def logout(request: Request):
 @app.get("/whiteboards/")
 def read_whiteboards(user: dict = Depends(get_authenticated_user_from_session_id)):
     with app.state.db.session() as session:
-        whiteboards = session.query(Whiteboard).filter(Whiteboard.user_id == user.id).all()
+        whiteboards = session.query(Whiteboard).filter(Whiteboard.owner_id == user.id).all()
         return whiteboards
 
 @app.post("/new_whiteboard/{name}")
@@ -139,7 +139,7 @@ def create_whiteboard(name: str, user: dict = Depends(get_authenticated_user_fro
 def update_whiteboard(whiteboard_id: int, name: str, user: dict = Depends(get_authenticated_user_from_session_id)):
     with app.state.db.session() as session:
         whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
-        if whiteboard is None or whiteboard.user_id != user.id:
+        if whiteboard is None or whiteboard.owner_id != user.id:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Whiteboard not found",
@@ -161,7 +161,7 @@ def delete_whiteboard(whiteboard_id: int, user: dict = Depends(get_authenticated
 
         app.state.qdrant.delete_collection(f"{whiteboard.name}-{whiteboard.id}")
 
-        if whiteboard is None or whiteboard.user_id != user.id:
+        if whiteboard is None or whiteboard.owner_id != user.id:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Whiteboard not found",
@@ -176,7 +176,7 @@ def delete_whiteboard(whiteboard_id: int, user: dict = Depends(get_authenticated
 def read_whiteboard_objects(whiteboard_id: int, user: dict = Depends(get_authenticated_user_from_session_id)):
     with app.state.db.session() as session:
         whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
-        if whiteboard is None or whiteboard.user_id != user.id:
+        if whiteboard is None or whiteboard.owner_id != user.id:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Whiteboard not found",
@@ -204,7 +204,7 @@ def get_embeddings(text: str):
 def create_whiteboard_object(whiteboard_id: int, data: dict = Body(...), user: dict = Depends(get_authenticated_user_from_session_id)):
     with app.state.db.session() as session:
         whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
-        if whiteboard is None or whiteboard.user_id != user.id:
+        if whiteboard is None or whiteboard.owner_id != user.id:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Whiteboard not found",
@@ -239,7 +239,7 @@ def create_whiteboard_object(whiteboard_id: int, data: dict = Body(...), user: d
 def update_whiteboard_object(whiteboard_id: int, object_id: int, data: dict = Body(...), user: dict = Depends(get_authenticated_user_from_session_id)):
     with app.state.db.session() as session:
         whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
-        if whiteboard is None or whiteboard.user_id != user.id:
+        if whiteboard is None or whiteboard.owner_id != user.id:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Whiteboard not found",
@@ -288,7 +288,7 @@ def delete_whiteboard_object(whiteboard_id: int, object_id: int, user: dict = De
 
     with app.state.db.session() as session:
         whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
-        if whiteboard is None or whiteboard.user_id != user.id:
+        if whiteboard is None or whiteboard.owner_id != user.id:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Whiteboard not found",
