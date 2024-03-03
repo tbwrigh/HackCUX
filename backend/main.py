@@ -13,11 +13,11 @@ from os import getenv
 
 import random
 
-from .db import DB
-from .models.user import User
-from .models.whiteboard import Whiteboard
-from .models.whiteboard_object import WhiteboardObject
-from .models.vector import Vector
+from db import DB
+from models.user import User
+from models.whiteboard import Whiteboard
+from models.whiteboard_object import WhiteboardObject
+from models.vector import Vector
 
 load_dotenv()
 
