@@ -18,7 +18,7 @@ function WebsiteWobject(props: WobjectProps) {
                     left: 0,
                 }}
                 className='w-full h-full'
-                src={props.wobject.fields.find(field => field.type == "id")!.value}
+                src={props.wobject.fields.find(field => field.type == "url")!.value}
             />
         </div>
     );

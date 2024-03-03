@@ -81,7 +81,7 @@ export const WobjectTypes = [
   },
   {
     label: 'Website',
-    type: 'tweet',
+    type: 'website',
     icon: 'public',
     fields: [{
       label: 'URL',
