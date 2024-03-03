@@ -8,7 +8,6 @@ class WhiteboardObject(Base):
     __tableargs__ = (UniqueConstraint('whiteboard_id', 'object_id'),)
 
     id: Mapped[int] = mapped_column(sqlalchemy.Integer, primary_key=True)
-    type: Mapped[str] = mapped_column(sqlalchemy.String(50), nullable=False)
     whiteboard_id: Mapped[int] = mapped_column(sqlalchemy.Integer, sqlalchemy.ForeignKey('whiteboards.id'), nullable=False)
     creator_id: Mapped[int] = mapped_column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False)
     data: Mapped[dict] = mapped_column(sqlalchemy.JSON, nullable=False)
