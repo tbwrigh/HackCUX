@@ -229,7 +229,7 @@ def create_whiteboard_object(whiteboard_id: int, data: dict = Body(...), user: d
         session.add(whiteboard_object)
         session.commit()
 
-        if "text" in data:
+        if "text" in data and data["text"] != "":
             embeddings = get_embeddings(data["text"])
             points = []
             with app.state.db.session() as session:
@@ -281,7 +281,7 @@ def update_whiteboard_object(whiteboard_id: int, object_id: int, data: dict = Bo
                 ),
             )
 
-        if "text" in data:
+        if "text" in data and data["text"] != "":
             embeddings = get_embeddings(data["text"])
             points = []
             with app.state.db.session() as session:
