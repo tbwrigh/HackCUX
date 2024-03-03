@@ -3,6 +3,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 
 from pymemcache.client import base
+from qdrant_client import QdrantClient
+from qdrant_client.http import models
+
+import cohere
 
 from dotenv import load_dotenv
 from os import getenv
@@ -13,6 +17,7 @@ from .db import DB
 from .models.user import User
 from .models.whiteboard import Whiteboard
 from .models.whiteboard_object import WhiteboardObject
+from .models.vector import Vector
 
 load_dotenv()
 
@@ -33,6 +38,9 @@ def startup_event():
     app.state.db = DB()
     app.state.cache = base.Client((getenv("MEMCACHE_HOST"), int(getenv("MEMCACHE_PORT"))))
     app.state.session_count = 1
+    app.state.qdrant = QdrantClient(host=getenv("QDRANT_HOST"), port=int(getenv("QDRANT_PORT")), prefer_grpc=True)
+    app.state.cohere = cohere.Client(getenv("COHERE_API_KEY"))
+
 
 @app.get("/")
 def read_root():
@@ -117,17 +125,29 @@ def create_whiteboard(name: str, user: dict = Depends(get_authenticated_user_fro
         session.add(whiteboard)
         session.commit()
 
+    app.state.qdrant.create_collection(
+        collection_name=f"{whiteboard.name}-{whiteboard.id}",
+        vectors_config=models.VectorsConfig(
+            dimension=1024,
+            distance=models.Distance.euclidean,
+        )
+    )
+
     return {"message": "Whiteboard created successfully"}
 
 @app.delete("/delete_whiteboard/{whiteboard_id}")
 def delete_whiteboard(whiteboard_id: int, user: dict = Depends(get_authenticated_user_from_session_id)):
     with app.state.db.session() as session:
         whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
+
+        app.state.qdrant.delete_collection(f"{whiteboard.name}-{whiteboard.id}")
+
         if whiteboard is None or whiteboard.user_id != user.id:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Whiteboard not found",
             )
+
         session.delete(whiteboard)
         session.commit()
 
@@ -144,7 +164,23 @@ def read_whiteboard_objects(whiteboard_id: int, user: dict = Depends(get_authent
             )
         whiteboard_objects = session.query(WhiteboardObject).filter(WhiteboardObject.whiteboard_id == whiteboard_id).all()
         return whiteboard_objects
-    
+
+def get_embeddings(text: str):
+    tokens = app.state.cohere.tokenize(text)["token_strings"]
+    chunks = [tokens[i:i + 512].join(" ") for i in range(0, len(tokens), 512)]
+    embed_pairs = []
+    if len(chunks) > 90:
+        for i in range(0, len(chunks), 90):
+            embedding = app.state.cohere.embed(texts=chunks[i:i+90],model="embed-english-v3.0",input_type="search_document")
+            for vector, text in zip(embedding["embeddings"], embedding["texts"]):
+                embed_pairs.append((vector, text))
+    else:
+        embedding = app.state.cohere.embed(texts=chunks,model="embed-english-v3.0",input_type="search_document")
+        for vector, text in zip(embedding["embeddings"], embedding["texts"]):
+                embed_pairs.append((vector, text))
+
+    return embed_pairs
+
 @app.post("/new_whiteboard_object/{whiteboard_id}")
 def create_whiteboard_object(whiteboard_id: int, data: dict = Body(...), user: dict = Depends(get_authenticated_user_from_session_id)):
     with app.state.db.session() as session:
@@ -158,10 +194,31 @@ def create_whiteboard_object(whiteboard_id: int, data: dict = Body(...), user: d
         session.add(whiteboard_object)
         session.commit()
 
+    if "text" in data:
+        embeddings = get_embeddings(data["text"])
+        points = []
+        with app.state.db.session() as session:
+            for embedding in embeddings:
+                vector = Vector(whiteboard_object_id=whiteboard_object.id)
+                session.add(vector)
+                points.append(
+                    models.Point(
+                        id=vector.id,
+                        vector=embedding[0],
+                        payload={"text": embedding[1]}
+                    )
+                )
+            session.commit()
+        app.state.qdrant.upsert(
+            collection_name=f"{whiteboard.name}-{whiteboard.id}",
+            points=points
+        )
+
     return {"message": "Whiteboard object created successfully"}
 
 @app.delete("/delete_whiteboard_object/{whiteboard_id}/{object_id}")
 def delete_whiteboard_object(whiteboard_id: int, object_id: int, user: dict = Depends(get_authenticated_user_from_session_id)):
+
     with app.state.db.session() as session:
         whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
         if whiteboard is None or whiteboard.user_id != user.id:
@@ -175,7 +232,15 @@ def delete_whiteboard_object(whiteboard_id: int, object_id: int, user: dict = De
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Whiteboard object not found",
             )
+        
+        vectors = session.query(Vector).filter(Vector.whiteboard_object_id == object_id).all()
+        ids = [vector.id for vector in vectors]
+        app.state.qdrant.delete(
+            collection_name=f"{whiteboard.name}-{whiteboard.id}",
+            ids=ids
+        )
+
         session.delete(whiteboard_object)
         session.commit()
-
+    
     return {"message": "Whiteboard object deleted successfully"}

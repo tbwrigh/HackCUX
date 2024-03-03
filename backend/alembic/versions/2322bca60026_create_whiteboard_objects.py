@@ -23,8 +23,8 @@ def upgrade() -> None:
         "whiteboard_objects",
         sa.Column("id", sa.Integer, primary_key=True),
         sa.Column("type", sa.String(50), nullable=False),
-        sa.Column("whiteboard_id", sa.Integer, sa.ForeignKey("whiteboards.id"), nullable=False),
-        sa.Column("creator_id", sa.Integer, sa.ForeignKey("users.id"), nullable=False),
+        sa.Column("whiteboard_id", sa.Integer, sa.ForeignKey("whiteboards.id", ondelete="CASCADE"), nullable=False),
+        sa.Column("creator_id", sa.Integer, sa.ForeignKey("users.id", ondelete="CASCADE"), nullable=False),
         sa.Column("data", sa.JSON, nullable=False),
     )
 
