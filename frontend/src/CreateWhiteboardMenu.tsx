@@ -9,41 +9,34 @@ interface CreateWhiteboardMenuProps {
 
 function CreateWhiteboardMenu(props: CreateWhiteboardMenuProps) {
     const entries = [{
-        label: "Name",
-        hint: "awesomecoolwhiteboard",
+        label: "New Whiteboard",
+        hint: "Enter a name",
         type: "name",
         value: "",
     }];
 
     return (
-        <div
-            className="fixed z-[9999] w-32 bg-white shadow-lg bg-gray-100 text-lg p-6"
-            style={{
-                width: 500,
-                marginTop: -250,
-                marginLeft: -250,
-                top: "50%",
-                left: "50%"
-            }}
-        >
+        <div className="fixed w-full h-full bg-black/35 z-40">
+        <dialog className="fixed rounded-lg z-50 inset-0 w-96 h-min bg-white shadow-lg bg-gray-100 py-4 px-6" open>
             {entries.map((field, i) => (
-                <div key={i} className="mb-6">
-                    <label className="block text-gray-700 text-lg font-bold mb-2">{field.label}</label>
+                <div key={i}>
+                    <label className="block font-extrabold text-2xl py-3 text-center">{field.label}</label>
                     <input
                         type="text"
-                        className="shadow appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className="outline outline-1 outline-gray-300 rounded-full w-full my-3 py-3 px-4 text-gray-700 focus:outline-none focus:ring focus:ring-blue-700"
                         placeholder={field.hint}
                         onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                             const newValue = (event.target || event.currentTarget) as HTMLInputElement;
                             field.value = newValue.value;
                         }}
+                        autoFocus
                     />
                 </div>
             ))}
             <div className="flex justify-center">
                 <button
                     type="submit"
-                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-lg focus:outline-none focus:shadow-outline transform transition-colors duration-150"
+                    className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors duration-150"
                     onClick={(event: React.MouseEvent) => {
                         const chosenName = entries.find(entry => entry.type == "name")!.value;
 
@@ -69,6 +62,7 @@ function CreateWhiteboardMenu(props: CreateWhiteboardMenuProps) {
                     Create
                 </button>
             </div>
+        </dialog>
         </div>
     );
 }
