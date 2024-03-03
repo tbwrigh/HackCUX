@@ -1,14 +1,52 @@
 import { Buffer } from "buffer";
 import { useState } from 'react';
+import { useNavigate } from "react-router-dom";
 
 const SignupPage = () => {
+    const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
 
-    const handleSignup = async () => {
-        doSignup(username, password, confirmPassword)
+    const handleSignup = async (e: React.FormEvent) => {
+        e.preventDefault();
+        doSignup(username, password, confirmPassword);
     };
+
+    const doSignup = async (username: string, password: string, confirmPassword: string): Promise<void> => {
+
+        if (password !== confirmPassword) {
+            alert("Passwords do not match!");
+            return;
+        }
+    
+        const headers = new Headers();
+        headers.append("Content-Type", "application/json");
+    
+        try {
+            console.log(`sending a request to ${import.meta.env.VITE_BASE_URL}`);
+            const response = await fetch(`${import.meta.env.VITE_BASE_URL}/signup`, {
+                headers: headers,
+                method: 'POST',
+                body: JSON.stringify({
+                    username: username,
+                    password: password,
+                }),
+            });
+    
+            if (response.status !== 200) {
+                alert("Signup failed! (NOT 200)");
+                return;
+            }
+            else {
+                navigate("../login");
+            }
+        } catch (error) {
+            console.error(error);
+            alert("Signup failed! (REQUEST)");
+            return;
+        }
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -50,35 +88,5 @@ const SignupPage = () => {
     );
 };
 
-const doSignup = async (username: string, password: string, confirmPassword: string): Promise<void> => {
-    if (password !== confirmPassword) {
-        alert("Passwords do not match!");
-        return;
-    }
-
-    const headers = new Headers();
-    headers.append("Content-Type", "application/json");
-
-    try {
-        console.log(`sending a request to ${import.meta.env.VITE_BASE_URL}`);
-        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/signup`, {
-            headers: headers,
-            method: 'POST',
-            body: JSON.stringify({
-                username: username,
-                password: password,
-            }),
-        });
-
-        if (response.status !== 200) {
-            alert("Signup failed! (NOT 200)");
-            return;
-        }
-    } catch (error) {
-        console.error(error);
-        alert("Signup failed! (REQUEST)");
-        return;
-    }
-}
 
 export default SignupPage;
