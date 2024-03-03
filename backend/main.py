@@ -121,7 +121,7 @@ def read_whiteboards(user: dict = Depends(get_authenticated_user_from_session_id
 @app.post("/new_whiteboard/{name}")
 def create_whiteboard(name: str, user: dict = Depends(get_authenticated_user_from_session_id)):
     with app.state.db.session() as session:
-        whiteboard = Whiteboard(name=name, user_id=user.id)
+        whiteboard = Whiteboard(name=name, owner_id=user.id)
         session.add(whiteboard)
         session.commit()
 
