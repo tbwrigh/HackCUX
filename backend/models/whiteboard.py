@@ -7,7 +7,7 @@ class Whiteboard(Base):
     __tablename__ = 'whiteboards'
     __tableargs__ = (UniqueConstraint('name'),)
 
-    id: Mapped[int] = mapped_column(sqlalchemy.Integer, primary_key=True)
+    id: Mapped[int] = mapped_column(sqlalchemy.Integer, primary_key=True, autoincrement=True)
     name: Mapped[str] = mapped_column(sqlalchemy.String(50), nullable=False)
     owner_id: Mapped[int] = mapped_column(sqlalchemy.Integer, sqlalchemy.ForeignKey('users.id'), nullable=False)
 

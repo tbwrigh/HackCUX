@@ -21,7 +21,7 @@ depends_on: Union[str, Sequence[str], None] = None
 def upgrade() -> None:
     op.create_table(
         'whiteboard_object_vector_id_mappings',
-        sa.Column('id', sa.Integer, nullable=False),
+        sa.Column('id', sa.Integer, primary_key=True, autoincrement=True),
         sa.Column('whiteboard_object_id', sa.Integer, sa.ForeignKey("whiteboard_objects.id", ondelete="CASCADE"), nullable=False),
     )
 
