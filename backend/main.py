@@ -135,6 +135,25 @@ def create_whiteboard(name: str, user: dict = Depends(get_authenticated_user_fro
 
     return {"message": "Whiteboard created successfully"}
 
+@app.put("/update_whiteboard/{whiteboard_id}/{name}")
+def update_whiteboard(whiteboard_id: int, name: str, user: dict = Depends(get_authenticated_user_from_session_id)):
+    with app.state.db.session() as session:
+        whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
+        if whiteboard is None or whiteboard.user_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Whiteboard not found",
+            )
+        whiteboard.name = name
+        session.commit()
+
+    app.state.qdrant.rename_collection(
+        old_collection_name=f"{whiteboard.name}-{whiteboard.id}",
+        new_collection_name=f"{name}-{whiteboard.id}"
+    )
+
+    return {"message": "Whiteboard updated successfully"}
+
 @app.delete("/delete_whiteboard/{whiteboard_id}")
 def delete_whiteboard(whiteboard_id: int, user: dict = Depends(get_authenticated_user_from_session_id)):
     with app.state.db.session() as session:
