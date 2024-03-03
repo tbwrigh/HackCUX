@@ -10,7 +10,7 @@ import WhiteboardMenu from './CreateWobjectMenu.tsx'
 
 import CodeWobject from './wobjects/Code.tsx'
 
-import CreatedWobject from './wobjects/Wobject.ts'
+import { CreatedWobject, BaseWobject, WobjectTypes } from './wobjects/Wobject.ts'
 
 interface Wobject {
     x: number;
@@ -24,6 +24,7 @@ interface Wobject {
     currentWidth: number;
     currentHeight: number;
     ref: React.RefObject<HTMLDivElement>;
+    wobject: React.ReactNode;
 }
 
 interface RightClickMenu {
@@ -76,7 +77,9 @@ const Whiteboard: React.FC = () => {
         }
     }, [wobjects]);
 
-    function createNewWobject(x: number, y: number) {
+    function createNewWobject(x: number, y: number, type: string) {
+        const chosenWobject = WobjectTypes.find(wobject => wobject.type == type)!;
+
         setWobjects([...wobjects, {
             x: x,
             y: y,
@@ -89,12 +92,13 @@ const Whiteboard: React.FC = () => {
             currentWidth: 0,
             currentHeight: 0,
             ref: React.createRef(),
+            wobject: React.createElement(chosenWobject.class),
         }]);
     }
 
     useEffect(() => {
         if (createdWobject) {
-            createNewWobject(createdWobject.x, createdWobject.y)
+            createNewWobject(createdWobject.x, createdWobject.y, createdWobject.type);
 
             setRightClickMenu(null);
             setCreatedWobject(null);
@@ -102,7 +106,7 @@ const Whiteboard: React.FC = () => {
     }, [createdWobject]);
 
     const handleDoubleClick = (e: React.MouseEvent) => {
-        createNewWobject(e.clientX, e.clientY);
+        createNewWobject(e.clientX, e.clientY, "text");
     };
 
     const handleDragStart = (e: React.MouseEvent, id: number) => {
@@ -171,8 +175,8 @@ const Whiteboard: React.FC = () => {
                     onMouseUp={(e) => handleDragEnd(e, wobject.id)}
                     className={`w-full h-screen relative ${wobject.currentWidth == 0 ? 'display-none' : ''}`}
                     style={{
-                        width: 100,
-                        height: 100,
+                        width: 500,
+                        height: 500,
                         backgroundColor: 'skyblue',
                         position: 'absolute',
                         cursor: 'grab',
@@ -180,7 +184,7 @@ const Whiteboard: React.FC = () => {
                         top: wobject.y - wobject.currentHeight / 2,
                     }}
                 >
-                    <Wobject></Wobject>
+                    <Wobject>{wobject.wobject}</Wobject>
                 </div>
             ))
             }
