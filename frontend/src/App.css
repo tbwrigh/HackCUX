@@ -1094,6 +1094,14 @@ video {
   z-index: 100;
 }
 
+.m-0 {
+  margin: 0px;
+}
+
+.m-0\.5 {
+  margin: 0.125rem;
+}
+
 .m-2 {
   margin: 0.5rem;
 }
@@ -1307,6 +1315,10 @@ video {
   overflow: auto;
 }
 
+.overflow-hidden {
+  overflow: hidden;
+}
+
 .overflow-y-auto {
   overflow-y: auto;
 }
@@ -1348,10 +1360,6 @@ video {
 
 .border {
   border-width: 1px;
-}
-
-.border-2 {
-  border-width: 2px;
 }
 
 .border-none {
@@ -1499,6 +1507,10 @@ video {
 .text-4xl {
   font-size: 2.25rem;
   line-height: 2.5rem;
+}
+
+.text-\[1\.5rem\] {
+  font-size: 1.5rem;
 }
 
 .text-lg {

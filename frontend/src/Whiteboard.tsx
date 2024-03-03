@@ -276,9 +276,8 @@ function Whiteboard(props: WhiteboardProps) {
                             onMouseDown={(e) => onMouseDownElement(e, wobject.id)}
                             onMouseUp={(e) => onMouseUpElement(e, wobject.id)}
                             onMouseLeave={(e) => onMouseLeaveElement(e, wobject.id)}
-                            className={`${wobject.currentWidth == 0 ? 'display-none' : ''} border-2`}
+                            className={`${wobject.currentWidth == 0 ? 'display-none' : ''} border border-1 border-gray-300 rounded-lg overflow-hidden`}
                             style={{
-                                backgroundColor: 'skyblue',
                                 position: 'absolute',
                                 cursor: 'grab',
                                 overflow: 'hidden',
@@ -295,8 +294,8 @@ function Whiteboard(props: WhiteboardProps) {
                                     }}
                                 >
                                     <span className="flex-1"></span>
-                                    <i className="material-icons align-middle">fullscreen</i>
-                                    <i className="material-icons align-middle">close</i>
+                                    <i className="block material-icons align-middle text-[1.5rem] m-0.5">fullscreen</i>
+                                    <i className="block material-icons align-middle text-[1.5rem] m-0.5">close</i>
                                 </div>
                                 {wobject.wobjectElement}
                             </div>
