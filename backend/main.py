@@ -396,7 +396,10 @@ def chat_recieve_message(whiteboard_id: int, data: dict = Body(...), user: dict 
 
         vectors = vectors[:3]
 
-        documents = [{"snippet": vector.payload["text"]} for vector in vectors]
+        documents = [{"type": "document", "text": vector.payload["text"]} for vector in vectors]
+
+        if "message_history" in data:
+            documents += [{"type": "message", "text": message} for message in data["message_history"]]
 
         resp = app.state.cohere.chat(
             model="command",
