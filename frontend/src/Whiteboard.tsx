@@ -10,7 +10,7 @@ import WhiteboardMenu from './CreateWobjectMenu.tsx'
 
 import CodeWobject from './wobjects/Code.tsx'
 
-import { CreatedWobject, BaseWobject, WobjectTypes } from './wobjects/Wobject.ts'
+import { CreatedWobject, WobjectTypes } from './wobjects/Wobject.ts'
 
 interface Wobject {
     x: number;
@@ -126,6 +126,7 @@ const Whiteboard: React.FC = () => {
             }
             return wobject;
         }));
+
         return false;
     };
 
@@ -136,7 +137,6 @@ const Whiteboard: React.FC = () => {
             }
             return wobject;
         }));
-
     };
 
     const handleClick = useCallback((e: React.MouseEvent) => {
@@ -167,7 +167,7 @@ const Whiteboard: React.FC = () => {
     };
 
     return (
-        <div onMouseMove={handleDrag} onClick={handleClick} onContextMenu={handleContextMenu} className="w-full h-full">
+        <div onMouseMove={handleDrag} onClickCapture={handleClick} onContextMenu={handleContextMenu} className="w-full h-full">
             {wobjects.map((wobject) => (
                 <div
                     ref={wobject.ref}

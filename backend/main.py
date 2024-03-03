@@ -13,11 +13,11 @@ from os import getenv
 
 import random
 
-from .db import DB
-from .models.user import User
-from .models.whiteboard import Whiteboard
-from .models.whiteboard_object import WhiteboardObject
-from .models.vector import Vector
+from db import DB
+from models.user import User
+from models.whiteboard import Whiteboard
+from models.whiteboard_object import WhiteboardObject
+from models.vector import Vector
 
 load_dotenv()
 
@@ -135,6 +135,25 @@ def create_whiteboard(name: str, user: dict = Depends(get_authenticated_user_fro
 
     return {"message": "Whiteboard created successfully"}
 
+@app.put("/update_whiteboard/{whiteboard_id}/{name}")
+def update_whiteboard(whiteboard_id: int, name: str, user: dict = Depends(get_authenticated_user_from_session_id)):
+    with app.state.db.session() as session:
+        whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
+        if whiteboard is None or whiteboard.user_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Whiteboard not found",
+            )
+        whiteboard.name = name
+        session.commit()
+
+    app.state.qdrant.rename_collection(
+        old_collection_name=f"{whiteboard.name}-{whiteboard.id}",
+        new_collection_name=f"{name}-{whiteboard.id}"
+    )
+
+    return {"message": "Whiteboard updated successfully"}
+
 @app.delete("/delete_whiteboard/{whiteboard_id}")
 def delete_whiteboard(whiteboard_id: int, user: dict = Depends(get_authenticated_user_from_session_id)):
     with app.state.db.session() as session:
@@ -216,6 +235,54 @@ def create_whiteboard_object(whiteboard_id: int, data: dict = Body(...), user: d
 
     return {"message": "Whiteboard object created successfully"}
 
+@app.put("/update_whiteboard_object/{whiteboard_id}/{object_id}")
+def update_whiteboard_object(whiteboard_id: int, object_id: int, data: dict = Body(...), user: dict = Depends(get_authenticated_user_from_session_id)):
+    with app.state.db.session() as session:
+        whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
+        if whiteboard is None or whiteboard.user_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Whiteboard not found",
+            )
+        whiteboard_object = session.query(WhiteboardObject).filter(WhiteboardObject.id == object_id).first()
+        if whiteboard_object is None or whiteboard_object.whiteboard_id != whiteboard_id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Whiteboard object not found",
+            )
+        whiteboard_object.data = data
+        session.commit()
+
+        vectors = session.query(Vector).filter(Vector.whiteboard_object_id == object_id).all()
+        ids = [vector.id for vector in vectors]
+        if len(ids) > 0:
+            app.state.qdrant.delete(
+                collection_name=f"{whiteboard.name}-{whiteboard.id}",
+                ids=ids
+            )
+
+    if "text" in data:
+        embeddings = get_embeddings(data["text"])
+        points = []
+        with app.state.db.session() as session:
+            for embedding in embeddings:
+                vector = Vector(whiteboard_object_id=whiteboard_object.id)
+                session.add(vector)
+                points.append(
+                    models.Point(
+                        id=vector.id,
+                        vector=embedding[0],
+                        payload={"text": embedding[1]}
+                    )
+                )
+            session.commit()
+        app.state.qdrant.upsert(
+            collection_name=f"{whiteboard.name}-{whiteboard.id}",
+            points=points
+        )
+    
+    return {"message": "Whiteboard object updated successfully"}
+
 @app.delete("/delete_whiteboard_object/{whiteboard_id}/{object_id}")
 def delete_whiteboard_object(whiteboard_id: int, object_id: int, user: dict = Depends(get_authenticated_user_from_session_id)):
 
@@ -235,10 +302,11 @@ def delete_whiteboard_object(whiteboard_id: int, object_id: int, user: dict = De
         
         vectors = session.query(Vector).filter(Vector.whiteboard_object_id == object_id).all()
         ids = [vector.id for vector in vectors]
-        app.state.qdrant.delete(
-            collection_name=f"{whiteboard.name}-{whiteboard.id}",
-            ids=ids
-        )
+        if len(ids) > 0:
+            app.state.qdrant.delete(
+                collection_name=f"{whiteboard.name}-{whiteboard.id}",
+                ids=ids
+            )
 
         session.delete(whiteboard_object)
         session.commit()
