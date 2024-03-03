@@ -5,7 +5,7 @@ import './App.css'
 import HamburgerMenu from './HamburgerMenu.tsx'
 import Whiteboard from "./Whiteboard.tsx"
 import { useQuery, QueryKey, QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { WhiteboardMetadata } from './api/ApiTypes.ts'
+import { WhiteboardMetadataGET } from './api/ApiTypes.ts'
 import ToolsSidebar from './ToolsSidebar.tsx'
 import { useCookies } from 'react-cookie'
 import AddWhiteboardPopup from './AddWhiteboardPopup.tsx'
@@ -25,13 +25,15 @@ function QueryApp() {
   headers.append('Content-Type', 'application/json');
   headers.append('Cookie', 'session_id=' + session_id);
 
-  const { isLoading, isError, data } = useQuery<boolean, boolean, WhiteboardMetadata[]>({
+  const { isLoading, isError, data } = useQuery<boolean, boolean, WhiteboardMetadataGET[]>({
     queryKey: ['GET', 'whiteboards'],
   });
   // const whiteboards = data.map((w) => <Whiteboard id={w.id} />);
 
   if (isLoading) return <div>Loading...</div>;
   if (data == undefined || isError) return <div>Error fetching whiteboards!</div>;
+
+  console.log(data);
 
   const closePopup = () => {
     setIsPopupOpen(false);
@@ -52,7 +54,9 @@ function QueryApp() {
       }
     ).then((res) =>
       res.json(),
-    );
+    ).then((data) => {
+      console.log(data);
+    })
     closePopup();
   };
 
@@ -83,7 +87,7 @@ function QueryApp() {
         <div className="w-full h-full h-screen">
           <div className="">
             <ToolsSidebar whiteboardID={selectedWhiteboardID} selectedWobject={selectedWobject} />
-            <HamburgerMenu whiteboardMetadatas={data} setIsPopupOpen={setIsPopupOpen} setSelectedWhiteboardID={setSelectedWhiteboardID} />
+            <HamburgerMenu WhiteboardMetadataGETs={data} setIsPopupOpen={setIsPopupOpen} setSelectedWhiteboardID={setSelectedWhiteboardID} />
           </div>
           <div className="w-full h-full flex-1">
             {/* whiteboards */}

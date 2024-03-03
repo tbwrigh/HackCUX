@@ -9,12 +9,25 @@ function WhiteboardMenu(props: CreateWobjectProps) {
     const [createdWobject, setCreatedWobject] = useState<CreatedWobject | null>(null);
 
     const handleClickContextMenu = (e: React.MouseEvent, type: string) => {
-        setCreatedWobject({
-            type: type,
-            x: e.clientX,
-            y: e.clientY,
-            fields: [],
-        });
+        if (WobjectTypes.find(wobject => wobject.type == type)!.fields.length == 0) {
+            // Directly set
+            props.setCreatedWobject({
+                type: type,
+                x: e.clientX,
+                y: e.clientY,
+                fields: [],
+                customData: "",
+            });
+        } else {
+            // Open menu
+            setCreatedWobject({
+                type: type,
+                x: e.clientX,
+                y: e.clientY,
+                fields: [],
+                customData: "",
+            });
+        }
     };
 
     return (
@@ -22,7 +35,7 @@ function WhiteboardMenu(props: CreateWobjectProps) {
             {
                 !createdWobject ?
                     <div
-                        className="absolute z-9999 w-32 bg-white shadow-lg"
+                        className="fixed z-9999 w-32 bg-white shadow-lg"
                         style={{ left: props.x, top: props.y }}
                     >
                         <ul className="text-sm text-gray-700">
@@ -36,7 +49,7 @@ function WhiteboardMenu(props: CreateWobjectProps) {
                     </div>
                     :
                     <div
-                        className="absolute z-9999 w-32 bg-white shadow-lg bg-gray-100 text-lg p-6"
+                        className="fixed z-9999 w-32 bg-white shadow-lg bg-gray-100 text-lg p-6"
                         style={{
                             width: 500,
                             marginTop: -250,

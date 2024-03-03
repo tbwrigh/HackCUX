@@ -14,7 +14,8 @@ export interface CreatedWobject {
   type: string;
   x: number;
   y: number;
-  fields: {type: string, value: string}[]
+  fields: {type: string, value: string}[];
+  customData: string;
 }
 
 export const WobjectTypes = [
@@ -51,4 +52,35 @@ export const WobjectTypes = [
 
 export interface WobjectProps {
   wobject: CreatedWobject,
+}
+
+export interface Wobject {
+  type: string;
+
+  x: number;
+  y: number;
+  xMouseStart: number;
+  yMouseStart: number;
+  xStart: number;
+  yStart: number;
+  currentlyDragging: boolean;
+
+  xMouseStartExtending: number;
+  yMouseStartExtending: number;
+  xStartExtending: number;
+  yStartExtending: number;
+  currentlyExtending: boolean;
+
+  selected: boolean;
+  id: number;
+  currentWidth: number;
+  currentHeight: number;
+  ref: React.RefObject<HTMLDivElement>;
+  extendingRef: React.RefObject<HTMLDivElement>;
+  wobjectElement: React.ReactNode;
+  z: number;
+
+  networkId: number|null;
+
+  wobject: CreatedWobject;
 }

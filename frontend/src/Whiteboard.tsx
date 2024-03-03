@@ -6,43 +6,17 @@ import './App.css'
 import './CreateWobjectMenu.tsx'
 import { useQuery, QueryKey, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
-import Wobject from './Wobject.tsx'
 import WhiteboardMenu from './CreateWobjectMenu.tsx'
 
 import CodeWobject from './wobjects/Code.tsx'
 
 import LoadingElement from './Loading.tsx'
 
-import { CreatedWobject, WobjectTypes } from './wobjects/Wobject.ts'
+import { CreatedWobject, WobjectTypes, Wobject } from './wobjects/Wobject.ts'
 
-import { WhiteboardMetadata } from './api/ApiTypes.ts'
+import { WhiteboardMetadataGET } from './api/ApiTypes.ts'
 
-interface Wobject {
-    type: string,
-
-    x: number;
-    y: number;
-    xMouseStart: number;
-    yMouseStart: number;
-    xStart: number;
-    yStart: number;
-    currentlyDragging: boolean;
-
-    xMouseStartExtending: number;
-    yMouseStartExtending: number;
-    xStartExtending: number;
-    yStartExtending: number;
-    currentlyExtending: boolean;
-
-    selected: boolean;
-    id: number;
-    currentWidth: number;
-    currentHeight: number;
-    ref: React.RefObject<HTMLDivElement>;
-    extendingRef: React.RefObject<HTMLDivElement>;
-    wobject: React.ReactNode;
-    z: number;
-}
+import SyncWhiteboard from './SyncWhiteboard.ts'
 
 interface RightClickMenu {
     x: number;
@@ -94,7 +68,7 @@ const EnsureMaximumSizeWobject = (w: number, h: number) => {
 };
 
 interface WhiteboardProps {
-    id: number | undefined;
+    id: number | null;
 }
 
 function Whiteboard(props: WhiteboardProps) {
@@ -107,12 +81,17 @@ function Whiteboard(props: WhiteboardProps) {
 
     const backPanel = useRef<HTMLDivElement>(null);
 
-    //const { isLoading, isError, data } = useQuery<boolean, boolean, WhiteboardMetadata[]>({
-    //    queryKey: ['GET', 'whiteboards'],
-    //});
-    //
-    //if (isLoading) return <LoadingElement />
-    //if (data == undefined || isError) return <div>Error fetching whiteboards!</div>;
+    let isLoading = false;
+    let isError = false;
+    let data = "";
+    if (props.id) {
+        ({ isLoading, isError, data } = useQuery<boolean, boolean, any>({
+            queryKey: ['GET', 'whiteboard_objects', props.id],
+        }));
+    }
+
+    // Class for automatically syncing
+    const syncWhiteboard = new SyncWhiteboard(props.id, wobjects);
 
     useLayoutEffect(() => {
         if (wobjects.some(wobject => wobject.currentWidth == 0)) {
@@ -148,10 +127,12 @@ function Whiteboard(props: WhiteboardProps) {
             currentHeight: 0,
             ref: React.createRef(),
             extendingRef: React.createRef(),
-            wobject: React.createElement(chosenWobject.class, { wobject }),
+            wobjectElement: React.createElement(chosenWobject.class, { wobject }),
             z: wobjects.length == 0 ? 0 : wobjects.reduce((maxObj, obj) => {
                 return obj.z > maxObj.z ? obj : maxObj;
-            }, wobjects[0]).z + 1
+            }, wobjects[0]).z + 1,
+            networkId: null,
+            wobject: wobject,
         }]);
     }
 
@@ -267,6 +248,9 @@ function Whiteboard(props: WhiteboardProps) {
         });
     };
 
+    if (isLoading) return <LoadingElement />
+    if (data == undefined || isError) return <div>Error fetching whiteboards!</div>;
+
     return (
         <div ref={backPanel} onMouseMove={handleDrag} onClickCapture={handleClick} onContextMenu={handleContextMenu} className="w-full h-full border-none">
             {wobjects.map((wobject) => (
@@ -286,7 +270,20 @@ function Whiteboard(props: WhiteboardProps) {
                         zIndex: wobject.z,
                     }}
                 >
-                    <Wobject>{wobject.wobject}</Wobject>
+
+                    <div className="border-none w-full h-full">
+                        <div className="w-full flex justify-between"
+                            style={{
+                                userSelect: 'none'
+                            }}
+                        >
+                            <span className="flex-1"></span>
+                            <i className="material-icons align-middle">fullscreen</i>
+                            <i className="material-icons align-middle">close</i>
+                        </div>
+                        {wobject.wobjectElement}
+                    </div>
+
                     <div
                         ref={wobject.extendingRef}
                         className='bg-transparent hover:bg-gray-100'
