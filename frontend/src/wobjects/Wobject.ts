@@ -1,7 +1,9 @@
 import React from 'react';
 
 import CodeWobject from './Code'
+import ImageWobject from './Image'
 import TextWobject from './Text'
+import TweetWobject from './Tweet'
 import VideoWobject from './Video'
 
 export interface CreateWobjectProps {
@@ -25,18 +27,8 @@ export const WobjectTypes = [
     type: 'text',
     icon: 'comment',
     fields: [],
+    preserveAspectRatio: false,
     class: TextWobject,
-  },
-  {
-    label: 'Video',
-    type: 'video',
-    icon: 'ondemand_video',
-    fields: [{
-      label: 'Youtube Code',
-      type: 'code',
-      hint: 'o3885gOxEmc',
-    }],
-    class: VideoWobject,
   },
   {
     label: 'Code',
@@ -47,8 +39,45 @@ export const WobjectTypes = [
       type: 'lang',
       hint: 'json, html, css, typescript, javascript',
     }],
+    preserveAspectRatio: false,
     class: CodeWobject,
-  }
+  },
+  {
+    label: 'Video',
+    type: 'video',
+    icon: 'ondemand_video',
+    fields: [{
+      label: 'Youtube Code',
+      type: 'code',
+      hint: 'o3885gOxEmc',
+    }],
+    preserveAspectRatio: true,
+    class: VideoWobject,
+  },
+  {
+    label: 'Image',
+    type: 'image',
+    icon: 'image',
+    fields: [{
+      label: 'Image URL',
+      type: 'url',
+      hint: 'https://tgrcode.com/logo.png',
+    }],
+    preserveAspectRatio: true,
+    class: ImageWobject,
+  },
+  {
+    label: 'Tweet',
+    type: 'tweet',
+    icon: 'textsms',
+    fields: [{
+      label: 'Tweet ID',
+      type: 'id',
+      hint: '1763419200930947198',
+    }],
+    preserveAspectRatio: true,
+    class: TweetWobject,
+  },
 ];
 
 export interface WobjectProps {

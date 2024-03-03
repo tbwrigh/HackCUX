@@ -201,9 +201,9 @@ function Whiteboard(props: WhiteboardProps) {
                 if (wobject.currentlyExtending) {
                     const preprocessedWidth = wobject.xStartExtending + (e.clientX - wobject.xMouseStartExtending) * 2;
 
-                    // If the type is a video fix the aspect ratio
+                    // If the type is a aspect ratio preserving one fix the aspect ratio
                     let preprocessedHeight = 0;
-                    if (wobject.type == "video") {
+                    if (WobjectTypes.find(w => w.type == wobject.type)!.preserveAspectRatio) {
                         preprocessedHeight = wobject.currentHeight / wobject.currentWidth * preprocessedWidth;
                     } else {
                         preprocessedHeight = wobject.yStartExtending + (e.clientY - wobject.yMouseStartExtending) * 2;
@@ -230,9 +230,9 @@ function Whiteboard(props: WhiteboardProps) {
             if (wobject.currentlyExtending) {
                 const preprocessedWidth = wobject.xStartExtending + (e.clientX - wobject.xMouseStartExtending) * 2;
 
-                // If the type is a video fix the aspect ratio
+                // If the type is a aspect ratio preserving one fix the aspect ratio
                 let preprocessedHeight = 0;
-                if (wobject.type == "video") {
+                if (WobjectTypes.find(w => w.type == wobject.type)!.preserveAspectRatio) {
                     preprocessedHeight = wobject.currentHeight / wobject.currentWidth * preprocessedWidth;
                 } else {
                     preprocessedHeight = wobject.yStartExtending + (e.clientY - wobject.yMouseStartExtending) * 2;

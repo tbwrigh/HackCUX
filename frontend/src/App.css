@@ -1305,6 +1305,10 @@ video {
   border-width: 0;
 }
 
+.pointer-events-none {
+  pointer-events: none;
+}
+
 .fixed {
   position: fixed;
 }
@@ -1477,6 +1481,10 @@ video {
   min-height: 100vh;
 }
 
+.min-h-64 {
+  min-height: 16rem;
+}
+
 .w-32 {
   width: 8rem;
 }
@@ -1503,6 +1511,10 @@ video {
 
 .min-w-72 {
   min-width: 18rem;
+}
+
+.min-w-64 {
+  min-width: 16rem;
 }
 
 .max-w-md {
@@ -1560,6 +1572,12 @@ video {
 
 .cursor-pointer {
   cursor: pointer;
+}
+
+.select-none {
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
 }
 
 .appearance-none {
