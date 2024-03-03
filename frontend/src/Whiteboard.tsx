@@ -53,7 +53,6 @@ function useMultiClickHandler(handler: Record<number, HandlerFunction>, delay: n
             setState({ clicks: 0, args: [] });
 
             if (state.clicks > 0 && typeof handler[state.clicks] === 'function') {
-                console.log("sjsdhjkdhdhkkdhsj")
                 handler[state.clicks](...state.args);
             }
         }, delay);
@@ -70,6 +69,25 @@ function useMultiClickHandler(handler: Record<number, HandlerFunction>, delay: n
     };
 }
 
+const EnsureMaximumSizeWobject = (w: number, h: number) => {
+    const maximumW = 900;
+    const maximumH = 600;
+
+    if (w > maximumW) {
+        const aspectRatio = h / w;
+        w = maximumW;
+        h = maximumW * aspectRatio;
+    }
+
+    if (h > maximumH) {
+        const aspectRatio = w / h;
+        h = maximumH;
+        w = maximumH * aspectRatio;
+    }
+
+    return [w, h];
+};
+
 const Whiteboard: React.FC = () => {
     const [wobjects, setWobjects] = useState<Wobject[]>([]);
     const [rightClickMenu, setRightClickMenu] = useState<RightClickMenu | null>(null);
@@ -77,6 +95,8 @@ const Whiteboard: React.FC = () => {
     const [clickTimeout, setClickTimeout] = useState<number | null>(null);
 
     const [createdWobject, setCreatedWobject] = useState<CreatedWobject | null>(null);
+
+    const backPanel = useRef<HTMLDivElement>(null);
 
     useLayoutEffect(() => {
         if (wobjects.some(wobject => wobject.currentWidth == 0)) {
@@ -89,13 +109,13 @@ const Whiteboard: React.FC = () => {
         }
     }, [wobjects]);
 
-    function createNewWobject(x: number, y: number, type: string) {
-        const chosenWobject = WobjectTypes.find(wobject => wobject.type == type)!;
+    function createNewWobject(wobject: CreatedWobject) {
+        const chosenWobject = WobjectTypes.find(w => w.type == wobject.type)!;
 
         setWobjects([...wobjects, {
-            type: type,
-            x: x,
-            y: y,
+            type: wobject.type,
+            x: wobject.x,
+            y: wobject.y,
             xMouseStart: 0,
             yMouseStart: 0,
             xStart: 0,
@@ -112,7 +132,7 @@ const Whiteboard: React.FC = () => {
             currentHeight: 0,
             ref: React.createRef(),
             extendingRef: React.createRef(),
-            wobject: React.createElement(chosenWobject.class),
+            wobject: React.createElement(chosenWobject.class, { wobject }),
             z: wobjects.length == 0 ? 0 : wobjects.reduce((maxObj, obj) => {
                 return obj.z > maxObj.z ? obj : maxObj;
             }, wobjects[0]).z + 1
@@ -121,7 +141,7 @@ const Whiteboard: React.FC = () => {
 
     useEffect(() => {
         if (createdWobject) {
-            createNewWobject(createdWobject.x, createdWobject.y, createdWobject.type);
+            createNewWobject(createdWobject);
 
             setRightClickMenu(null);
             setCreatedWobject(null);
@@ -135,7 +155,6 @@ const Whiteboard: React.FC = () => {
 
     const onMouseDownElement = (e: React.MouseEvent, id: number) => {
         setWobjects(wobjects.map((wobject) => {
-            console.log(e.target, wobject.extendingRef.current!)
             if (e.target == wobject.extendingRef.current!) {
                 return { ...wobject, xStartExtending: wobject.currentWidth, yStartExtending: wobject.currentHeight, xMouseStartExtending: e.clientX, yMouseStartExtending: e.clientY, currentlyExtending: true };
             } else if (wobject.id == id) {
@@ -151,27 +170,31 @@ const Whiteboard: React.FC = () => {
     };
 
     const handleDrag = (e: React.MouseEvent) => {
-        setWobjects(wobjects.map((wobject) => {
-            if (wobject.currentlyExtending) {
-                const newWidth = wobject.xStartExtending + (e.clientX - wobject.xMouseStartExtending) * 2;
+        if (wobjects.some(wobject => wobject.currentlyExtending || wobject.currentlyDragging)) {
+            setWobjects(wobjects.map((wobject) => {
+                if (wobject.currentlyExtending) {
+                    const preprocessedWidth = wobject.xStartExtending + (e.clientX - wobject.xMouseStartExtending) * 2;
 
-                // If the type is a video fix the aspect ratio
-                let newHeight = 0;
-                if (wobject.type == "video") {
-                    newHeight = wobject.currentHeight / wobject.currentWidth * newWidth;
-                } else {
-                    newHeight = wobject.yStartExtending + (e.clientY - wobject.yMouseStartExtending) * 2;
+                    // If the type is a video fix the aspect ratio
+                    let preprocessedHeight = 0;
+                    if (wobject.type == "video") {
+                        preprocessedHeight = wobject.currentHeight / wobject.currentWidth * preprocessedWidth;
+                    } else {
+                        preprocessedHeight = wobject.yStartExtending + (e.clientY - wobject.yMouseStartExtending) * 2;
+                    }
+
+                    const [newWidth, newHeight] = EnsureMaximumSizeWobject(preprocessedWidth, preprocessedHeight);
+
+                    wobject.ref.current!.style.width = `${newWidth}px`;
+                    wobject.ref.current!.style.height = `${newHeight}px`;
+                    return { ...wobject, currentWidth: newWidth, currentHeight: newHeight };
+                } else if (wobject.currentlyDragging) {
+                    return { ...wobject, x: wobject.xStart + e.clientX - wobject.xMouseStart, y: wobject.yStart + e.clientY - wobject.yMouseStart };
                 }
 
-                wobject.ref.current!.style.width = `${newWidth}px`;
-                wobject.ref.current!.style.height = `${newHeight}px`;
-                return { ...wobject, currentWidth: newWidth, currentHeight: newHeight };
-            } else if (wobject.currentlyDragging) {
-                return { ...wobject, x: wobject.xStart + e.clientX - wobject.xMouseStart, y: wobject.yStart + e.clientY - wobject.yMouseStart };
-            }
-
-            return wobject;
-        }));
+                return wobject;
+            }));
+        }
 
         return false;
     };
@@ -179,15 +202,17 @@ const Whiteboard: React.FC = () => {
     const onMouseUpElement = (e: React.MouseEvent, id: number) => {
         setWobjects(wobjects.map((wobject) => {
             if (wobject.currentlyExtending) {
-                const newWidth = wobject.xStartExtending + (e.clientX - wobject.xMouseStartExtending) * 2;
+                const preprocessedWidth = wobject.xStartExtending + (e.clientX - wobject.xMouseStartExtending) * 2;
 
                 // If the type is a video fix the aspect ratio
-                let newHeight = 0;
+                let preprocessedHeight = 0;
                 if (wobject.type == "video") {
-                    newHeight = wobject.currentHeight / wobject.currentWidth * newWidth;
+                    preprocessedHeight = wobject.currentHeight / wobject.currentWidth * preprocessedWidth;
                 } else {
-                    newHeight = wobject.yStartExtending + (e.clientY - wobject.yMouseStartExtending) * 2;
+                    preprocessedHeight = wobject.yStartExtending + (e.clientY - wobject.yMouseStartExtending) * 2;
                 }
+
+                const [newWidth, newHeight] = EnsureMaximumSizeWobject(preprocessedWidth, preprocessedHeight);
 
                 return { ...wobject, currentWidth: newWidth, currentHeight: newHeight, currentlyExtending: false };
             } else if (wobject.currentlyDragging && wobject.id == id) {
@@ -207,7 +232,9 @@ const Whiteboard: React.FC = () => {
             const timeout = setTimeout(() => {
                 if (e.button === 0) {
                     // Left
-                    setRightClickMenu(null);
+                    if (e.target == backPanel.current) {
+                        setRightClickMenu(null);
+                    }
                 }
 
                 setClickTimeout(null);
@@ -225,7 +252,7 @@ const Whiteboard: React.FC = () => {
     };
 
     return (
-        <div onMouseMove={handleDrag} onClickCapture={handleClick} onContextMenu={handleContextMenu} className="w-full h-full border-none">
+        <div ref={backPanel} onMouseMove={handleDrag} onClickCapture={handleClick} onContextMenu={handleContextMenu} className="w-full h-full border-none">
             {wobjects.map((wobject) => (
                 <div
                     ref={wobject.ref}

@@ -14,7 +14,7 @@ function QueryApp() {
 
   const [cookies, setCookie] = useCookies(['session_id']);
   const session_id = cookies.session_id;
-  
+
   const [selectedWhiteboardID, setSelectedWhiteboardID] = useState(0)
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
@@ -23,7 +23,7 @@ function QueryApp() {
   /* why does this block of code exist?!?!?!?! */
   const headers = new Headers();
   headers.append('Content-Type', 'application/json');
-  headers.append('Cookie', 'session_id='+session_id);
+  headers.append('Cookie', 'session_id=' + session_id);
 
   const { isLoading, isError, data } = useQuery<boolean, boolean, WhiteboardMetadata[]>({
     queryKey: ['GET', 'whiteboards'],
@@ -67,22 +67,22 @@ function QueryApp() {
           </form>
         </dialog>
       )}
-      {data.length == 0 
-        ? 
-          <div> 
-            <p>Welcome! To begin, make your first whiteboard by clicking </p> 
-            <button onClick={() => setIsPopupOpen(true)}>here!</button> 
-          </div>
+      {data.length == 0
+        ?
+        <div>
+          <p>Welcome! To begin, make your first whiteboard by clicking </p>
+          <button onClick={() => setIsPopupOpen(true)}>here!</button>
+        </div>
         :
-          <div className="w-full h-full h-screen">
-            <div className="">
-              <ToolsSidebar whiteboardID={selectedWhiteboardID} selectedWobject={selectedWobject}/>
-              <HamburgerMenu whiteboardMetadatas={data} setIsPopupOpen={setIsPopupOpen} setSelectedWhiteboardID={setSelectedWhiteboardID} />
-            </div>
-            <div className="w-full flex-1">
-              <Whiteboard />
-            </div>
-          </div>}
+        <div className="w-full h-full h-screen">
+          <div className="">
+            <ToolsSidebar whiteboardID={selectedWhiteboardID} selectedWobject={selectedWobject} />
+            <HamburgerMenu whiteboardMetadatas={data} setIsPopupOpen={setIsPopupOpen} setSelectedWhiteboardID={setSelectedWhiteboardID} />
+          </div>
+          <div className="w-full flex-1">
+            <Whiteboard />
+          </div>
+        </div>}
     </div>
   )
 }

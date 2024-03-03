@@ -4,7 +4,7 @@ import '../App.css';
 import { WobjectProps } from "./Wobject";
 
 function VideoWobject(props: WobjectProps) {
-    const videoId = 'dQw4w9WgXcQ';
+    const videoId = props.wobject.fields.find(field => field.type == "code")?.value;
     const videoUrl = `https://www.youtube.com/embed/${videoId}`;
 
     return (
