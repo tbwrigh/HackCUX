@@ -3,10 +3,14 @@ import React from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import './Wobject.tsx'
-import './WhiteboardMenu.tsx'
+import './CreateWobjectMenu.tsx'
+
 import Wobject from './Wobject.tsx'
-import WhiteboardMenu from './WhiteboardMenu.tsx'
+import WhiteboardMenu from './CreateWobjectMenu.tsx'
+
+import CodeWobject from './wobjects/Code.tsx'
+
+import CreatedWobject from './wobjects/Wobject.ts'
 
 interface Wobject {
     x: number;
@@ -20,12 +24,6 @@ interface Wobject {
     currentWidth: number;
     currentHeight: number;
     ref: React.RefObject<HTMLDivElement>;
-}
-
-export interface CreateWobject {
-    type: string;
-    x: number;
-    y: number;
 }
 
 interface RightClickMenu {
@@ -65,7 +63,7 @@ const Whiteboard: React.FC = () => {
 
     const [clickTimeout, setClickTimeout] = useState<number | null>(null);
 
-    const [createWobject, setCreateWobject] = useState<CreateWobject | null>(null);
+    const [createdWobject, setCreatedWobject] = useState<CreatedWobject | null>(null);
 
     useLayoutEffect(() => {
         if (wobjects.some(wobject => wobject.currentWidth == 0)) {
@@ -95,13 +93,13 @@ const Whiteboard: React.FC = () => {
     }
 
     useEffect(() => {
-        if (createWobject) {
-            createNewWobject(createWobject.x, createWobject.y)
+        if (createdWobject) {
+            createNewWobject(createdWobject.x, createdWobject.y)
 
             setRightClickMenu(null);
-            setCreateWobject(null);
+            setCreatedWobject(null);
         }
-    }, [createWobject]);
+    }, [createdWobject]);
 
     const handleDoubleClick = (e: React.MouseEvent) => {
         createNewWobject(e.clientX, e.clientY);
@@ -186,7 +184,7 @@ const Whiteboard: React.FC = () => {
                 </div>
             ))
             }
-            {rightClickMenu ? <WhiteboardMenu x={rightClickMenu.x} y={rightClickMenu.y} setCreateWobject={setCreateWobject} /> : <div></div>}
+            {rightClickMenu ? <WhiteboardMenu x={rightClickMenu.x} y={rightClickMenu.y} setCreatedWobject={setCreatedWobject} /> : <div></div>}
         </div>
     );
 };

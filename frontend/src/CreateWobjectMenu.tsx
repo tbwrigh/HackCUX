@@ -1,14 +1,8 @@
 import React from 'react';
 
-import { CreateWobject } from "./Whiteboard"
+import { CreatedWobject } from "./wobjects/Wobject.ts"
 
 import './App.css'
-
-interface WhiteboardMenuProps {
-    x: number;
-    y: number;
-    setCreateWobject: React.Dispatch<React.SetStateAction<CreateWobject | null>>;
-}
 
 function WhiteboardMenu(props: WhiteboardMenuProps) {
     const options = [{
@@ -23,7 +17,7 @@ function WhiteboardMenu(props: WhiteboardMenuProps) {
     }];
 
     const handleClick = (e: React.MouseEvent, type: string) => {
-        props.setCreateWobject({
+        props.setCreatedWobject({
             type: type,
             x: e.clientX,
             y: e.clientY,
