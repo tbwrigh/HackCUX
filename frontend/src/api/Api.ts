@@ -6,9 +6,10 @@ export class Api {
   constructor() {}
 
   syncWobjects(wobjects: Wobject[], whiteboardID: number) {
+    console.log('Syncing');
     wobjects.forEach((w) => {
-      if (!w.networkId) {
-        w.networkId = 1;
+      if (!w.wobject.networkId) {
+        w.wobject.networkId = 1;
         fetch(
             `${import.meta.env.VITE_BASE_URL}/new_whiteboard_object/${
                 whiteboardID}/`,
@@ -24,12 +25,12 @@ export class Api {
             })
             .then((res) => res.json())
             .then((data: {id: number}) => {
-              w.networkId = data.id;
+              w.wobject.networkId = data.id;
             });
-      } else if (w.networkId != 1) {
+      } else if (w.wobject.networkId != 1) {
         fetch(
             `${import.meta.env.VITE_BASE_URL}/update_whiteboard_object/${
-                whiteboardID}/${w.networkId}/`,
+                whiteboardID}/${w.wobject.networkId}/`,
             {
               method: 'PUT',
               headers: new Headers({
@@ -63,6 +64,21 @@ export class Api {
         .then((data: WhiteboardObjectsGET[]) => {
           callback(data);
         });
+  }
+
+  removeWhiteBoardObject(whiteboardID: number, wobjectID: number) {
+    fetch(
+        `${import.meta.env.VITE_BASE_URL}/delete_whiteboard_object/${
+            whiteboardID}/${wobjectID}`,
+        {
+          method: 'DELETE',
+          headers: new Headers({
+            'Content-Type': 'application/json',
+          }),
+          credentials: 'include',
+        })
+        .then((res) => res.json())
+        .then((data) => {console.log(data)});
   }
 
   getWhiteboards(callback: (data: WhiteboardMetadataGET[]) => void) {

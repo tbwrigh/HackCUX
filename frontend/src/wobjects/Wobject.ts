@@ -14,6 +14,7 @@ export interface CreatedWobject {
   type: string;
   x: number;
   y: number;
+  networkId: number|null;
   fields: {type: string, value: string}[];
   customData: string;
 }
@@ -79,8 +80,6 @@ export interface Wobject {
   extendingRef: React.RefObject<HTMLDivElement>;
   wobjectElement: React.ReactNode;
   z: number;
-
-  networkId: number|null;
 
   wobject: CreatedWobject;
 }

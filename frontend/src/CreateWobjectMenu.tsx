@@ -15,6 +15,7 @@ function WhiteboardMenu(props: CreateWobjectProps) {
                 type: type,
                 x: e.clientX,
                 y: e.clientY,
+                networkId: null,
                 fields: [],
                 customData: "",
             });
@@ -24,6 +25,7 @@ function WhiteboardMenu(props: CreateWobjectProps) {
                 type: type,
                 x: e.clientX,
                 y: e.clientY,
+                networkId: null,
                 fields: [],
                 customData: "",
             });

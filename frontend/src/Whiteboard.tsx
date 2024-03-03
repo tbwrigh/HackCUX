@@ -117,7 +117,6 @@ function Whiteboard(props: WhiteboardProps) {
                     z: wobjects.length == 0 ? 0 : wobjects.reduce((maxObj, obj) => {
                         return obj.z > maxObj.z ? obj : maxObj;
                     }, wobjects[0]).z + 1,
-                    networkId: data.id,
                     wobject: wobject,
                 }
             }));
@@ -151,7 +150,6 @@ function Whiteboard(props: WhiteboardProps) {
             z: wobjects.length == 0 ? 0 : wobjects.reduce((maxObj, obj) => {
                 return obj.z > maxObj.z ? obj : maxObj;
             }, wobjects[0]).z + 1,
-            networkId: null,
             wobject: wobject,
         }]);
     }
@@ -325,7 +323,7 @@ function Whiteboard(props: WhiteboardProps) {
                         onMouseDown={(e) => onMouseDownElement(e, wobject.id)}
                         onMouseUp={(e) => onMouseUpElement(e, wobject.id)}
                         onMouseLeave={(e) => onMouseLeaveElement(e, wobject.id)}
-                        className={`${wobject.currentWidth == 0 ? 'display-none' : ''} border border-1 border-gray-300 rounded-lg overflow-hidden`}
+                        className={`${wobject.currentWidth == 0 ? 'display-none' : ''} bg-white border border-1 border-gray-300 rounded-lg overflow-hidden`}
                         style={{
                             position: 'absolute',
                             cursor: 'grab',
@@ -345,10 +343,10 @@ function Whiteboard(props: WhiteboardProps) {
                                 <span className="flex-1"></span>
                                 <i className="block material-icons align-middle text-[1.5rem] m-0.5" onClick={() => copyToClipboard(wobject)}>content_copy</i>
                                 <i className="block material-icons align-middle text-[1.5rem] m-0.5" onClick={() => {
-                                  let index = 0;
-                                  while (wobjects.at(index).id != wobject.id) index++;
-                                  // setWobjects(Array.prototype.toSpliced.call(wobjects, index, 1));
-                                  setWobjects(wobjects.toSpliced(index, 1));
+                                    setWobjects(wobjects.filter((w) => w.id != wobject.id));
+                                    if (wobject.wobject.networkId) {
+                                        props.api.removeWhiteBoardObject(props.id, wobject.wobject.networkId);
+                                    }
                                 }}>close</i>
                             </div>
                             {wobject.wobjectElement}
@@ -356,7 +354,7 @@ function Whiteboard(props: WhiteboardProps) {
 
                         <div
                             ref={wobject.extendingRef}
-                            className='bg-transparent hover:bg-gray-100'
+                            className='hover:bg-gray-100'
                             style={{
                                 position: "absolute",
                                 width: "20px",
