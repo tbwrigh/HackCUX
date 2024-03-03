@@ -7,8 +7,8 @@ class Vector(Base):
     __tablename__ = "whiteboard_object_vector_id_mappings"
 
     id: Mapped[int] = mapped_column(sqlalchemy.Integer, primary_key=True)
-    whiteboard_obj_id: Mapped[int] = mapped_column(sqlalchemy.Integer, sqlalchemy.ForeignKey('whiteboard_objects.id'), nullable=False)
+    whiteboard_object_id: Mapped[int] = mapped_column(sqlalchemy.Integer, sqlalchemy.ForeignKey('whiteboard_objects.id'), nullable=False)
 
     def __repr__(self):
-        return f"<Share(whiteboard_obj_id={self.whiteboard_obj_id})>"  
+        return f"<Share(whiteboard_object_id={self.whiteboard_object_id})>"  
     
