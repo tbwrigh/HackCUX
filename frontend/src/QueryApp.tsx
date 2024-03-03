@@ -15,7 +15,7 @@ function QueryApp() {
   const [cookies, setCookie] = useCookies(['session_id']);
   const session_id = cookies.session_id;
 
-  const [selectedWhiteboardID, setSelectedWhiteboardID] = useState(0)
+  const [selectedWhiteboardID, setSelectedWhiteboardID] = useState(null)
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const [selectedWobject, setSelectedWobject] = useState(null);
@@ -52,11 +52,11 @@ function QueryApp() {
         }),
         credentials: 'include',
       }
-    ).then((res) =>
-      res.json(),
-    ).then((data) => {
-      console.log(data);
-    })
+    )
+      .then((res) =>
+        res.json(),
+      )
+      .then((res) => setSelectedWhiteboardID(res.id));
     closePopup();
   };
 
@@ -90,7 +90,7 @@ function QueryApp() {
             <HamburgerMenu WhiteboardMetadataGETs={data} setIsPopupOpen={setIsPopupOpen} setSelectedWhiteboardID={setSelectedWhiteboardID} />
           </div>
           <div className="w-full h-full flex-1">
-            {/* whiteboards */}
+            {selectedWhiteboardID ? <Whiteboard id={selectedWhiteboardID} /> : null}
           </div>
         </div>}
     </div>
