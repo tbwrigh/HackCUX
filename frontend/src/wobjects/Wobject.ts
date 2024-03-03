@@ -2,7 +2,7 @@ import React from 'react';
 
 import CodeWobject from './Code'
 import TextWobject from './Text'
-import YouTubeWobject from './Video'
+import VideoWobject from './Video'
 
 export interface CreateWobjectProps {
   x: number;
@@ -27,7 +27,7 @@ export const WobjectTypes = [
     label: 'Video',
     type: 'video',
     icon: 'ondemand_video',
-    class: YouTubeWobject,
+    class: VideoWobject,
   },
   {
     label: 'Code',

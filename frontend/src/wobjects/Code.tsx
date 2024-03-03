@@ -7,9 +7,7 @@ import { WobjectProps } from "./Wobject"
 
 function CodeWobject(props: WobjectProps) {
     return (
-        <div>
-            <Editor height="90vh" defaultLanguage="javascript" defaultValue="// some comment" />;
-        </div>
+        <Editor className="w-full h-full min-w-72 min-h-72" defaultLanguage="javascript" defaultValue="// Type some JS code here... with intellisense!" />
     );
 }
 

@@ -3,14 +3,22 @@ import '../App.css';
 
 import { WobjectProps } from "./Wobject";
 
-function YouTubeWobject(props: WobjectProps) {
+function VideoWobject(props: WobjectProps) {
     const videoId = 'dQw4w9WgXcQ';
     const videoUrl = `https://www.youtube.com/embed/${videoId}`;
 
     return (
-        <div className="video-container" style={{ position: 'relative', paddingBottom: '56.25%' /* 16:9 Aspect Ratio */, paddingTop: '25px', height: 0 }}>
+        <div className="w-full h-full min-w-72" style={{
+            position: 'relative',
+            aspectRatio: '16 / 9',
+        }}>
             <iframe
-                style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+                style={{
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                }}
+                className='w-full h-full'
                 src={videoUrl}
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -21,4 +29,4 @@ function YouTubeWobject(props: WobjectProps) {
     );
 }
 
-export default YouTubeWobject;
+export default VideoWobject;
