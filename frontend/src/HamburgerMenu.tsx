@@ -1,39 +1,41 @@
 import { useState } from 'react'
-import './HamburgerMenu.css'
 import WhiteboardItem from './WhiteboardItem';
 import { WhiteboardMetadata } from './WhiteboardMetadata';
+import './HamburgerMenu.css';
 
 interface HamburgerMenuProps {
   whiteboardMetadatas: WhiteboardMetadata[];
+  setIsPopupOpen: (arg0: boolean) => void;
 }
 
-function HamburgerMenu({ whiteboardMetadatas }: HamburgerMenuProps) {
+function HamburgerMenu({whiteboardMetadatas, setIsPopupOpen}: HamburgerMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
   };
 
+  const onAddWhiteboardButtonPressed = () => {
+    setIsPopupOpen(true);
+  };
+
   return (
-    <>
-      <div>
-        <div className={`${isOpen ? 'open' : ''}`} onClick={toggleMenu}>
-          <i className="large material-icons">menu</i>
-        </div>
-        <div className={`${isOpen ? 'open' : ''}`}>
-          <div>
-            <ul>
-              {whiteboardMetadatas.map(item => (
+    <div className="app">
+      <div className={`menu-toggle ${isOpen ? 'open' : ''}`} onClick={toggleMenu}>
+        <div className="hamburger"></div>
+      </div>
+      <div className={`menu ${isOpen ? 'open' : ''}`}>
+        <ul>
+          {whiteboardMetadatas.map(item => (
                 <WhiteboardItem key={item.id} label={item.name} />
               ))}
-            </ul>
-          </div>
-          <button>+</button>
+        </ul>
+        <div>
+          <button className='add_btn' onClick={(onAddWhiteboardButtonPressed)}>Add Whiteboard</button>
         </div>
-        
       </div>
-    </>
-  )
+    </div>
+  );
 }
 
-export default HamburgerMenu
+export default HamburgerMenu;

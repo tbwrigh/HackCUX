@@ -8,6 +8,7 @@ import { useQuery, QueryKey, QueryClient, QueryClientProvider } from '@tanstack/
 import { WhiteboardMetadata } from './WhiteboardMetadata.ts';
 import ToolsSidebar from './ToolsSidebar.tsx'
 import { useCookies } from 'react-cookie';
+import AddWhiteboardPopup from './AddWhiteboardPopup.tsx'
 
 type Cookie = {
   session_id: string;
@@ -23,6 +24,7 @@ function QueryApp() {
   headers.append('Cookie', 'session_id='+session_id);
 
   const [count, setCount] = useState(0)
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
   const { isLoading, isError, data: whiteboardMetadatas } = useQuery({
     queryKey: ['repoData'],
     queryFn: () =>
@@ -34,12 +36,28 @@ function QueryApp() {
   //if (isLoading) return <div>Loading...</div>;
   //if (isError) return <div>Error fetching whiteboards!</div>;
 
+  const closePopup = () => {
+    setIsPopupOpen(false);
+  };
+
+  const makeWhiteboardOfName = (enteredName: string) => {
+    // TODO
+  };
+
   return (
     <div>
-      <div className="w-full h-full h-screen flex flex-row">
-        <div className="flex-none">
+      {isPopupOpen && (
+        <dialog open>
+          <h2>Enter your name:</h2>
+          <input type="text" />
+          <button onClick={closePopup}>Save</button>
+          <button onClick={closePopup}>Cancel</button>
+        </dialog>
+      )}
+      <div className="w-full h-full h-screen">
+        <div className="">
           <ToolsSidebar />
-          <HamburgerMenu whiteboardMetadatas={[]} />
+          <HamburgerMenu whiteboardMetadatas={[]} setIsPopupOpen={setIsPopupOpen} />
         </div>
         <div className="w-full flex-1">
           <Whiteboard />
