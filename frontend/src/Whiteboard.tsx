@@ -174,13 +174,14 @@ const Whiteboard: React.FC = () => {
                     key={wobject.id}
                     onMouseDown={(e) => handleDragStart(e, wobject.id)}
                     onMouseUp={(e) => handleDragEnd(e, wobject.id)}
-                    className={`w-full h-screen relative ${wobject.currentWidth == 0 ? 'display-none' : ''}`}
+                    className={`${wobject.currentWidth == 0 ? 'display-none' : ''}`}
                     style={{
-                        width: 500,
-                        height: 500,
+                        width: 300,
+                        height: 300,
                         backgroundColor: 'skyblue',
                         position: 'absolute',
                         cursor: 'grab',
+                        overflow: 'hidden',
                         left: wobject.x - wobject.currentWidth / 2,
                         top: wobject.y - wobject.currentHeight / 2,
                     }}
