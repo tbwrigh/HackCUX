@@ -336,7 +336,7 @@ def delete_whiteboard_object(whiteboard_id: int, object_id: int, user: dict = De
     
     return {"message": "Whiteboard object deleted successfully"}
 
-@app.get("/search/{whiteboard_id}")
+@app.post("/search/{whiteboard_id}")
 def search(whiteboard_id: int, data: dict = Body(...), user: dict = Depends(get_authenticated_user_from_session_id)):
     if "query" not in data:
         raise HTTPException(
@@ -364,3 +364,44 @@ def search(whiteboard_id: int, data: dict = Body(...), user: dict = Depends(get_
             )
     
         return vectors
+    
+
+@app.post("/chat/{whiteboard_id}")
+def chat_recieve_message(whiteboard_id: int, data: dict = Body(...), user: dict = Depends(get_authenticated_user_from_session_id)):
+    if "text" not in data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Text not found",
+        )
+    
+    with app.state.db.session() as session:
+        whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
+        if whiteboard is None or whiteboard.owner_id != user.id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Whiteboard not found",
+            )
+
+        embeddings = get_embeddings(data["text"])
+        vectors = []
+
+        for embedding in embeddings:
+            vectors += app.state.qdrant.search(
+                collection_name=f"{whiteboard.name}-{whiteboard.id}",
+                query_vector=embedding[0],
+                limit=2
+            )
+        
+        vectors = sorted(vectors, key=lambda x: x.score, reverse=True)
+
+        vectors = vectors[:3]
+
+        documents = [{"snippet": vector.payload["text"]} for vector in vectors]
+
+        resp = app.state.cohere.chat(
+            model="command",
+            message=data["text"],
+            documents=documents
+        )
+
+        return {"response": resp.text}
