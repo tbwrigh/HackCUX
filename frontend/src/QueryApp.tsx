@@ -3,7 +3,6 @@ import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
 import HamburgerMenu from './HamburgerMenu.tsx'
-import TextPreview from './TextPreview.tsx'
 import Whiteboard from "./Whiteboard.tsx"
 import { useQuery, QueryKey, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WhiteboardMetadata } from './WhiteboardMetadata.ts';
@@ -26,14 +25,14 @@ function QueryApp() {
   return (
     <div>
       <div className="w-full h-full h-screen flex flex-row">
-          <div className="flex-none">
-            <ToolsSidebar />
-            {/*<HamburgerMenu whiteboardMetadatas={whiteboardMetadatas} />*/}
-          </div>
-          <div className="w-full flex-1">
-            <Whiteboard />
-          </div>
+        <div className="flex-none">
+          <ToolsSidebar />
+          {/*<HamburgerMenu whiteboardMetadatas={whiteboardMetadatas} />*/}
         </div>
+        <div className="w-full flex-1">
+          <Whiteboard />
+        </div>
+      </div>
     </div>
   )
 }

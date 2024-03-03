@@ -1,6 +1,7 @@
 import React from 'react';
 
 import CodeWobject from './Code'
+import TextWobject from './Text'
 
 export interface CreateWobjectProps {
   x: number;
@@ -18,7 +19,7 @@ export const WobjectTypes = [
   {
     label: 'Text',
     type: 'text',
-    class: CodeWobject,
+    class: TextWobject,
   },
   {
     label: 'Video',

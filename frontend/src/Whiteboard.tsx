@@ -106,7 +106,8 @@ const Whiteboard: React.FC = () => {
     }, [createdWobject]);
 
     const handleDoubleClick = (e: React.MouseEvent) => {
-        createNewWobject(e.clientX, e.clientY, "text");
+        // Not now
+        //createNewWobject(e.clientX, e.clientY, "text");
     };
 
     const handleDragStart = (e: React.MouseEvent, id: number) => {
