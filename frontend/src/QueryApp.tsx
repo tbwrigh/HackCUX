@@ -60,9 +60,11 @@ function QueryApp() {
       {isPopupOpen && (
         <dialog open>
           <h2>Enter the whiteboard name:</h2>
-          <input type="text" />
-          <button onClick={makeWhiteboardOfName}>Save</button>
-          <button onClick={closePopup}>Cancel</button>
+          <form onSubmit={makeWhiteboardOfName}>
+            <input type="text" name="whiteboardName" />
+            <button type="submit">Save</button>
+            <button onClick={closePopup}>Cancel</button>
+          </form>
         </dialog>
       )}
       {data.length == 0 
