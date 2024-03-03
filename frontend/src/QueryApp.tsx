@@ -7,7 +7,7 @@ import Whiteboard from "./Whiteboard.tsx"
 import { useQuery, QueryKey, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WhiteboardMetadata } from './WhiteboardMetadata.ts';
 import ToolsSidebar from './ToolsSidebar.tsx'
-import { useCookies } from 'react-cookie';
+import { useCookies } from 'react-cookie'
 import AddWhiteboardPopup from './AddWhiteboardPopup.tsx'
 
 function QueryApp() {
@@ -15,24 +15,26 @@ function QueryApp() {
   const [cookies, setCookie] = useCookies(['session_id']);
   const session_id = cookies.session_id;
   
+  const [count, setCount] = useState(0)
+  const [isPopupOpen, setIsPopupOpen] = useState(false);
+
+  const [selectedWobject, setSelectedWobject] = useState(null);
+
+  /* why does this block of code exist?!?!?!?! */
   const headers = new Headers();
   headers.append('Content-Type', 'application/json');
   headers.append('Cookie', 'session_id='+session_id);
 
-  const [count, setCount] = useState(0)
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const { isLoading, isError, data: whiteboardMetadatas } = useQuery({
+  const { isLoading, isError, data } = useQuery({
     queryKey: ['repoData'],
-    queryFn: () =>
-      fetch(
-        `${import.meta.env.VITE_BASE_URL}/whiteboards`,
+    queryFn: async () => fetch(
+        `${import.meta.env.VITE_BASE_URL}/whiteboards/`,
         {
+          method: 'GET',
           credentials: 'include',
         }
-      ).then((res) =>
-        res.json(),
-      ),
-  })
+      ).then((res) => res.json())
+  });
 
   if (isLoading) return <div>Loading...</div>;
   if (isError) return <div>Error fetching whiteboards!</div>;
@@ -41,11 +43,24 @@ function QueryApp() {
     setIsPopupOpen(false);
   };
 
-  const makeWhiteboardOfName = (enteredName: string) => {
-    // TODO
+  const makeWhiteboardOfName = (e: React.FormEvent) => {
+    e.preventDefault();
+    const whiteboardName = Object.fromEntries((new FormData(e.target)).entries()).whiteboardName;
+    console.log(whiteboardName);
+    fetch(
+      `${import.meta.env.VITE_BASE_URL}/new_whiteboard/${whiteboardName}`,
+      {
+        method: 'POST',
+        headers: new Headers({
+          'Content-Type': 'application/json',
+        }),
+        credentials: 'include',
+      }
+    ).then((res) =>
+      res.json(),
+    );
+    closePopup();
   };
-
-  const [selectedWobject, setSelectedWobject] = useState(null)
 
   return (
     <div>
@@ -57,7 +72,7 @@ function QueryApp() {
           <button onClick={closePopup}>Cancel</button>
         </dialog>
       )}
-      {whiteboardMetadatas.length == 0 
+      {data.length == 0 
         ? 
           <div> 
             <p>Welcome! To begin, make your first whiteboard by clicking </p> 
@@ -67,7 +82,7 @@ function QueryApp() {
           <div className="w-full h-full h-screen">
             <div className="">
               <ToolsSidebar selectedWobject={selectedWobject}/>
-              <HamburgerMenu whiteboardMetadatas={[]} setIsPopupOpen={setIsPopupOpen} />
+              <HamburgerMenu whiteboardMetadatas={data} setIsPopupOpen={setIsPopupOpen} />
             </div>
             <div className="w-full flex-1">
               <Whiteboard />
