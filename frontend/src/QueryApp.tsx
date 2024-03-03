@@ -10,10 +10,6 @@ import ToolsSidebar from './ToolsSidebar.tsx'
 import { useCookies } from 'react-cookie';
 import AddWhiteboardPopup from './AddWhiteboardPopup.tsx'
 
-type Cookie = {
-  session_id: string;
-};
-
 function QueryApp() {
 
   const [cookies, setCookie] = useCookies(['session_id']);
@@ -28,13 +24,18 @@ function QueryApp() {
   const { isLoading, isError, data: whiteboardMetadatas } = useQuery({
     queryKey: ['repoData'],
     queryFn: () =>
-      fetch('{process.env.BASE_URL}/whiteboards/').then((res) =>
+      fetch(
+        `${import.meta.env.VITE_BASE_URL}/whiteboards`,
+        {
+          credentials: 'include',
+        }
+      ).then((res) =>
         res.json(),
       ),
   })
 
-  //if (isLoading) return <div>Loading...</div>;
-  //if (isError) return <div>Error fetching whiteboards!</div>;
+  if (isLoading) return <div>Loading...</div>;
+  if (isError) return <div>Error fetching whiteboards!</div>;
 
   const closePopup = () => {
     setIsPopupOpen(false);
