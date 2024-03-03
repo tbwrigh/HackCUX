@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
-import './QueryApp.css'
+import './App.css'
 import HamburgerMenu from './HamburgerMenu.tsx'
 import TextPreview from './TextPreview.tsx'
-import Whiteboard from "./whiteboard.tsx"
+import Whiteboard from "./Whiteboard.tsx"
 import { useQuery, QueryKey, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WhiteboardMetadata } from './WhiteboardMetadata.ts';
 import ToolsSidebar from './ToolsSidebar.tsx'
