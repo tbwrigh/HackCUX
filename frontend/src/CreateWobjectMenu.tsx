@@ -35,7 +35,7 @@ function WhiteboardMenu(props: CreateWobjectProps) {
             {
                 !createdWobject ?
                     <div
-                        className="fixed z-9999 w-32 bg-white shadow-lg"
+                        className="fixed z-[9999] w-32 bg-white shadow-lg"
                         style={{ left: props.x, top: props.y }}
                     >
                         <ul className="text-sm text-gray-700">

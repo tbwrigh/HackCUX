@@ -17,7 +17,7 @@ function CreateWhiteboardMenu(props: CreateWhiteboardMenuProps) {
 
     return (
         <div
-            className="fixed z-9999 w-32 bg-white shadow-lg bg-gray-100 text-lg p-6"
+            className="fixed z-[9999] w-32 bg-white shadow-lg bg-gray-100 text-lg p-6"
             style={{
                 width: 500,
                 marginTop: -250,

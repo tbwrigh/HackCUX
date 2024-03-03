@@ -58,7 +58,7 @@ function ChatWindow({WhiteboardIndex}: ChatWindowProps) {
   };
 
   return (
-    <div id={`chat-window-${WhiteboardIndex}`} className="fixed bottom-0 right-0 mb-4 mr-4 max-w-xs p-4 bg-white rounded-lg shadow-lg">
+    <div id={`chat-window-${WhiteboardIndex}`} className="fixed bottom-0 right-0 mb-4 mr-4 max-w-xs p-4 bg-white rounded-lg shadow-lg z-[9999]">
         <button
             onClick={() => setIsCollapsed(!isCollapsed)}
             className="block m-2 text-gray-800 self-end flex flex-row"

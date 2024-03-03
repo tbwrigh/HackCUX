@@ -28,7 +28,7 @@ function HamburgerMenu({ WhiteboardMetadataGETs, setIsPopupOpen, setSelectedWhit
           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
         </svg>
       </div>
-      <div className={`menu ${isOpen ? 'open' : ''} z-50 flex flex-col place-content-between bg-gray-100 p-2 pt-16`}>
+      <div className={`menu ${isOpen ? 'open' : ''} z-[9999] flex flex-col place-content-between bg-gray-100 p-2 pt-16`}>
         <ul className="flex flex-col gap-2">
           {WhiteboardMetadataGETs.map(item => (
             <WhiteboardItem key={item.id} id={item.id} label={item.name} setSelectedWhiteboardID={setSelectedWhiteboardID} />
