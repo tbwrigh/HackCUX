@@ -23,7 +23,8 @@ function QueryApp() {
   headers.append('Content-Type', 'application/json');
   headers.append('Cookie', 'session_id='+session_id);
 
-  const [count, setCount] = useState(0)
+  const [newWhiteboardName, setNewWhiteboardName] = useState('');
+
   const [isPopupOpen, setIsPopupOpen] = useState(false);
   const { isLoading, isError, data: whiteboardMetadatas } = useQuery({
     queryKey: ['repoData'],
@@ -41,7 +42,7 @@ function QueryApp() {
   };
 
   const makeWhiteboardOfName = (enteredName: string) => {
-    // TODO
+    
   };
 
   const [selectedWobject, setSelectedWobject] = useState(null)
@@ -51,8 +52,8 @@ function QueryApp() {
       {isPopupOpen && (
         <dialog open>
           <h2>Enter the whiteboard name:</h2>
-          <input type="text" />
-          <button onClick={closePopup}>Save</button>
+          <input type="text" value={newWhiteboardName} />
+          <button onClick={() => makeWhiteboardOfName(newWhiteboardName)}>Save</button>
           <button onClick={closePopup}>Cancel</button>
         </dialog>
       )}
