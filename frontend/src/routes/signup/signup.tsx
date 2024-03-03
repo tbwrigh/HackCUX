@@ -60,7 +60,8 @@ const doSignup = async (username: string, password: string, confirmPassword: str
     headers.append("Content-Type", "application/json");
 
     try {
-        const response = await fetch('${process.env.BASE_URL}/signup', {
+        console.log(`sending a request to ${import.meta.env.VITE_BASE_URL}`);
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/signup`, {
             headers: headers,
             method: 'POST',
             body: JSON.stringify({
@@ -74,6 +75,7 @@ const doSignup = async (username: string, password: string, confirmPassword: str
             return;
         }
     } catch (error) {
+        console.error(error);
         alert("Signup failed! (REQUEST)");
         return;
     }
