@@ -42,14 +42,14 @@ function WhiteboardMenu(props: CreateWobjectProps) {
                             {WobjectTypes.map((option, i) => (
                                 <li key={i} className="px-4 py-2 bg-gray-100 cursor-pointer text-lg flex justify-between w-full" onClick={(e) => handleClickContextMenu(e, option.type)}>
                                     <span>{option.label}</span>
-                                    <i className="material-icons align-middle">{option.icon}</i>
+                                    <i className="material-icons align-middle w-4 h-4">{option.icon}</i>
                                 </li>
                             ))}
                         </ul>
                     </div>
                     :
                     <div
-                        className="fixed z-9999 w-32 bg-white shadow-lg bg-gray-100 text-lg p-6"
+                        className="fixed z-10 w-32 bg-white shadow-lg bg-gray-100 text-lg p-6"
                         style={{
                             width: 500,
                             marginTop: -250,

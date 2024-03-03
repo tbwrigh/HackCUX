@@ -23,12 +23,12 @@ function HamburgerMenu({ WhiteboardMetadataGETs, setIsPopupOpen, setSelectedWhit
 
   return (
     <div className="app">
-      <div className={`menu-toggle ${isOpen ? 'open' : ''}`} onClick={toggleMenu}>
+      <div className={`menu-toggle ${isOpen ? 'open' : ''} z-[100]`} onClick={toggleMenu}>
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6">
           <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
         </svg>
       </div>
-      <div className={`menu ${isOpen ? 'open' : ''} flex flex-col place-content-between bg-gray-100 p-2 pt-16`}>
+      <div className={`menu ${isOpen ? 'open' : ''} z-50 flex flex-col place-content-between bg-gray-100 p-2 pt-16`}>
         <ul className="flex flex-col gap-2">
           {WhiteboardMetadataGETs.map(item => (
             <WhiteboardItem key={item.id} id={item.id} label={item.name} setSelectedWhiteboardID={setSelectedWhiteboardID} />

@@ -9,6 +9,7 @@ interface WhiteboardItemProps {
 function WhiteboardItem({ id, label, setSelectedWhiteboardID }: WhiteboardItemProps) {
 
   const onClick = () => {
+    console.log('selected a different whiteboard');
     setSelectedWhiteboardID(id);
   }
 
