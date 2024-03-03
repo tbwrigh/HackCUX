@@ -256,6 +256,7 @@ function Whiteboard(props: WhiteboardProps) {
                     key={wobject.id}
                     onMouseDown={(e) => onMouseDownElement(e, wobject.id)}
                     onMouseUp={(e) => onMouseUpElement(e, wobject.id)}
+                    onMouseOut={(e) => onMouseUpElement(e, wobject.id)}
                     className={`${wobject.currentWidth == 0 ? 'display-none' : ''} border border-1 border-gray-300 rounded-lg overflow-hidden`}
                     style={{
                         position: 'absolute',
@@ -285,8 +286,8 @@ function Whiteboard(props: WhiteboardProps) {
                         className='bg-transparent hover:bg-gray-100'
                         style={{
                             position: "absolute",
-                            width: "20px",
-                            height: "20px",
+                            width: "50px",
+                            height: "50px",
                             right: 0,
                             bottom: 0,
                         }} />
