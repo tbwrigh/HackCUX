@@ -296,6 +296,25 @@ function Whiteboard(props: WhiteboardProps) {
         });
     };
 
+    const copyToClipboard = (wobject: Wobject) => {
+
+        const textarea = document.createElement('textarea');
+        textarea.value = wobject.wobject.customData;
+
+        // Make the textarea out of viewport
+        textarea.style.position = 'fixed';
+        textarea.style.top = '-9999px';
+        textarea.style.left = '-9999px';
+
+        document.body.appendChild(textarea);
+
+        // Select and copy the text
+        textarea.select();
+        document.execCommand('copy');
+
+        document.body.removeChild(textarea);
+    }
+
     return (
         <>
             <div ref={backPanel} onMouseMove={handleDrag} onClickCapture={handleClick} onContextMenu={handleContextMenu} className="w-full h-full border-none">
@@ -324,7 +343,7 @@ function Whiteboard(props: WhiteboardProps) {
                                 }}
                             >
                                 <span className="flex-1"></span>
-                                <i className="block material-icons align-middle text-[1.5rem] m-0.5">fullscreen</i>
+                                <i className="block material-icons align-middle text-[1.5rem] m-0.5" onClick={() => copyToClipboard(wobject)}>content_copy</i>
                                 <i className="block material-icons align-middle text-[1.5rem] m-0.5" onClick={() => {
                                   let index = 0;
                                   while (wobjects.at(index).id != wobject.id) index++;
@@ -354,5 +373,6 @@ function Whiteboard(props: WhiteboardProps) {
         </>
     );
 };
+
 
 export default Whiteboard;
