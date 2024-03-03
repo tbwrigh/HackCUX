@@ -325,7 +325,12 @@ function Whiteboard(props: WhiteboardProps) {
                             >
                                 <span className="flex-1"></span>
                                 <i className="block material-icons align-middle text-[1.5rem] m-0.5">fullscreen</i>
-                                <i className="block material-icons align-middle text-[1.5rem] m-0.5">close</i>
+                                <i className="block material-icons align-middle text-[1.5rem] m-0.5" onClick={() => {
+                                  let index = 0;
+                                  while (wobjects.at(index).id != wobject.id) index++;
+                                  // setWobjects(Array.prototype.toSpliced.call(wobjects, index, 1));
+                                  setWobjects(wobjects.toSpliced(index, 1));
+                                }}>close</i>
                             </div>
                             {wobject.wobjectElement}
                         </div>
