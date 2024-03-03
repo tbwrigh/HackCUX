@@ -35,15 +35,15 @@ function TextWobject(props: WobjectProps) {
                     placeholder="Type Markdown here..."
                     rows={20}
                     cols={80}
-                    className="block w-full h-full p-2.5 text-sm text-gray-900 bg-gray-50 border border-gray-300 focus:ring-blue-500 focus:border-blue-500"
+                    className="block w-full h-full p-2.5 rounded-t-0 rounded-b-lg text-gray-900 bg-gray-50 border border-gray-300 focus:outline-blue-600"
                 ></textarea>
                 : null}
             {editing ? null :
                 <article
-                    className="w-full h-full prose p-8 transition duration-500 hover:bg-gray-100"
+                    className="w-full h-full prose-lg p-4 transition duration-500 hover:bg-gray-100"
                     onClick={() => setEditing(true)}
                 >
-                    <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeMathjax]} className={"text-xl"}>{content}</Markdown>
+                    <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeMathjax]}>{content}</Markdown>
                 </article>
             }
         </div>
