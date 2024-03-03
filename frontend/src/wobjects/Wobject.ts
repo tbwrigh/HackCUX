@@ -5,6 +5,7 @@ import ImageWobject from './Image'
 import TextWobject from './Text'
 import TweetWobject from './Tweet'
 import VideoWobject from './Video'
+import WebsiteWobject from './Website'
 
 export interface CreateWobjectProps {
   x: number;
@@ -77,6 +78,18 @@ export const WobjectTypes = [
     }],
     preserveAspectRatio: true,
     class: TweetWobject,
+  },
+  {
+    label: 'Website',
+    type: 'tweet',
+    icon: 'public',
+    fields: [{
+      label: 'URL',
+      type: 'url',
+      hint: 'https://tgrcode.com/',
+    }],
+    preserveAspectRatio: false,
+    class: WebsiteWobject,
   },
 ];
 
