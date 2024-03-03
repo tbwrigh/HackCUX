@@ -14,7 +14,7 @@ import LoadingElement from './Loading.tsx'
 
 import { CreatedWobject, WobjectTypes, Wobject } from './wobjects/Wobject.ts'
 
-import { WhiteboardMetadataGET } from './api/ApiTypes.ts'
+import { WhiteboardMetadataGET, WhiteboardObjectsGET } from './api/ApiTypes.ts'
 
 import ChatWindow from './ChatWindow.tsx'
 
@@ -83,9 +83,13 @@ function Whiteboard(props: WhiteboardProps) {
 
     const backPanel = useRef<HTMLDivElement>(null);
 
-    const { isLoading, isError, data } = useQuery<boolean, boolean, any>({
+    const { isLoading, isError, data } = useQuery<boolean, boolean, WhiteboardObjectsGET>({
         queryKey: ['GET', 'whiteboard_objects', props.id],
     });
+
+    useEffect(() => {
+        console.log(data);
+    }, [data]);
 
     // Class for automatically syncing
     const syncWhiteboard = new SyncWhiteboard(props.id, wobjects);
@@ -249,53 +253,59 @@ function Whiteboard(props: WhiteboardProps) {
     if (data == undefined || isError) return <div>Error fetching whiteboards!</div>;
 
     return (
-        <div ref={backPanel} onMouseMove={handleDrag} onClickCapture={handleClick} onContextMenu={handleContextMenu} className="w-full h-full border-none">
-            {wobjects.map((wobject) => (
-                <div
-                    ref={wobject.ref}
-                    key={wobject.id}
-                    onMouseDown={(e) => onMouseDownElement(e, wobject.id)}
-                    onMouseUp={(e) => onMouseUpElement(e, wobject.id)}
-                    className={`${wobject.currentWidth == 0 ? 'display-none' : ''} border border-1 border-gray-300 rounded-lg overflow-hidden`}
-                    style={{
-                        position: 'absolute',
-                        cursor: 'grab',
-                        overflow: 'hidden',
-                        left: wobject.x - wobject.currentWidth / 2,
-                        top: wobject.y - wobject.currentHeight / 2,
-                        zIndex: wobject.z,
-                    }}
-                >
-
-                    <div className="border-none w-full h-full">
-                        <div className="w-full h-7 flex justify-between"
+        <>
+            {isLoading || isError ? (
+                <div>Ah rip</div>
+            ) : (
+                <div ref={backPanel} onMouseMove={handleDrag} onClickCapture={handleClick} onContextMenu={handleContextMenu} className="w-full h-full border-none">
+                    {wobjects.map((wobject) => (
+                        <div
+                            ref={wobject.ref}
+                            key={wobject.id}
+                            onMouseDown={(e) => onMouseDownElement(e, wobject.id)}
+                            onMouseUp={(e) => onMouseUpElement(e, wobject.id)}
+                            className={`${wobject.currentWidth == 0 ? 'display-none' : ''} border-2`}
                             style={{
-                                userSelect: 'none'
+                                backgroundColor: 'skyblue',
+                                position: 'absolute',
+                                cursor: 'grab',
+                                overflow: 'hidden',
+                                left: wobject.x - wobject.currentWidth / 2,
+                                top: wobject.y - wobject.currentHeight / 2,
+                                zIndex: wobject.z,
                             }}
                         >
-                            <span className="flex-1"></span>
-                            <i className="block material-icons align-middle text-[1.5rem] m-0.5">fullscreen</i>
-                            <i className="block material-icons align-middle text-[1.5rem] m-0.5">close</i>
-                        </div>
-                        {wobject.wobjectElement}
-                    </div>
 
-                    <div
-                        ref={wobject.extendingRef}
-                        className='bg-transparent hover:bg-gray-100'
-                        style={{
-                            position: "absolute",
-                            width: "20px",
-                            height: "20px",
-                            right: 0,
-                            bottom: 0,
-                        }} />
+                            <div className="border-none w-full h-full">
+                                <div className="w-full flex justify-between"
+                                    style={{
+                                        userSelect: 'none'
+                                    }}
+                                >
+                                    <span className="flex-1"></span>
+                                    <i className="material-icons align-middle">fullscreen</i>
+                                    <i className="material-icons align-middle">close</i>
+                                </div>
+                                {wobject.wobjectElement}
+                            </div>
+
+                            <div
+                                ref={wobject.extendingRef}
+                                className='bg-transparent hover:bg-gray-100'
+                                style={{
+                                    position: "absolute",
+                                    width: "20px",
+                                    height: "20px",
+                                    right: 0,
+                                    bottom: 0,
+                                }} />
+                        </div>
+                    ))
+                    }
+                    {rightClickMenu ? <WhiteboardMenu x={rightClickMenu.x} y={rightClickMenu.y} setCreatedWobject={setCreatedWobject} /> : <div></div>}
                 </div>
-            ))
-            }
-            {rightClickMenu ? <WhiteboardMenu x={rightClickMenu.x} y={rightClickMenu.y} setCreatedWobject={setCreatedWobject} /> : <div></div>}
-            <ChatWindow WhiteboardIndex={props.id}/>
-        </div>
+            )}
+        </>
     );
 };
 

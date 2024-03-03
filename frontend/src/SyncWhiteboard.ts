@@ -8,6 +8,7 @@ class SyncWhiteboard {
   constructor(whiteboardId: number, wobjects: Wobject[]) {
     this.whiteboardId = whiteboardId;
 
+    /*
     setTimeout(() => {
       wobjects.forEach((wobject) => {
         if (!wobject.networkId) {
@@ -29,8 +30,8 @@ class SyncWhiteboard {
                 }),
               })
               .then((res) => res.json())
-              .then((data) => {
-                console.log(data);
+              .then((data: {id: number}) => {
+                wobject.networkId = data.id;
               });
         } else {
           fetch(
@@ -43,12 +44,12 @@ class SyncWhiteboard {
                 }),
                 credentials: 'include',
                 body: JSON.stringify({
-                    data: {
-                      text: wobject.wobject.customData,
-                      x: wobject.wobject.x,
-                      y: wobject.wobject.y,
-                    },
-                  }),
+                  data: {
+                    text: wobject.wobject.customData,
+                    x: wobject.wobject.x,
+                    y: wobject.wobject.y,
+                  },
+                }),
               })
               .then((res) => res.json())
               .then((data) => {
@@ -57,6 +58,7 @@ class SyncWhiteboard {
         }
       });
     }, 5000);
+    */
   }
 }
 
