@@ -18,8 +18,6 @@ import { WhiteboardMetadataGET, WhiteboardObjectsGET } from './api/ApiTypes.ts'
 
 import ChatWindow from './ChatWindow.tsx'
 
-import SyncWhiteboard from './SyncWhiteboard.ts'
-
 interface RightClickMenu {
     x: number;
     y: number;
@@ -83,12 +81,90 @@ function Whiteboard(props: WhiteboardProps) {
 
     const backPanel = useRef<HTMLDivElement>(null);
 
-    const { isLoading, isError, data } = useQuery<boolean, boolean, WhiteboardObjectsGET>({
+    const { isLoading, isError, data } = useQuery<boolean, boolean, WhiteboardObjectsGET[]>({
         queryKey: ['GET', 'whiteboard_objects', props.id],
     });
 
-    // Class for automatically syncing
-    const syncWhiteboard = new SyncWhiteboard(props.id, wobjects);
+    function sync(wobjects: Wobject[]) {
+        console.log("SYNC!!")
+        wobjects.forEach((w) => {
+            if (!w.networkId) {
+                console.log(w);
+                fetch(
+                    `${import.meta.env.VITE_BASE_URL}/new_whiteboard_object/${props.id}/`,
+                    {
+                        method: 'POST',
+                        headers: new Headers({
+                            'Content-Type': 'application/json',
+                        }),
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            data: w.wobject,
+                        }),
+                    })
+                    .then((res) => res.json())
+                    .then((data: { id: number }) => {
+                        w.networkId = data.id;
+                    });
+            } else {
+                console.log(w);
+                fetch(
+                    `${import.meta.env.VITE_BASE_URL}/update_whiteboard_object/${props.id}/${w.networkId}/`,
+                    {
+                        method: 'PUT',
+                        headers: new Headers({
+                            'Content-Type': 'application/json',
+                        }),
+                        credentials: 'include',
+                        body: JSON.stringify({
+                            data: w.wobject,
+                        }),
+                    })
+                    .then((res) => res.json())
+                    .then((data) => {
+                        console.log(data);
+                    });
+            }
+        });
+    }
+
+    if (data && data.length > 0 && wobjects.length == 0) {
+        const startingID = Date.now();
+
+        setWobjects(data.map((data, i) => {
+            const wobject = data.data;
+
+            const chosenWobject = WobjectTypes.find(w => w.type == wobject.type)!;
+
+            return {
+                type: wobject.type,
+                x: wobject.x,
+                y: wobject.y,
+                xMouseStart: 0,
+                yMouseStart: 0,
+                xStart: 0,
+                yStart: 0,
+                currentlyDragging: false,
+                xMouseStartExtending: 0,
+                yMouseStartExtending: 0,
+                xStartExtending: 0,
+                yStartExtending: 0,
+                currentlyExtending: false,
+                selected: false,
+                id: startingID + i,
+                currentWidth: 0,
+                currentHeight: 0,
+                ref: React.createRef(),
+                extendingRef: React.createRef(),
+                wobjectElement: React.createElement(chosenWobject.class, { wobject }),
+                z: wobjects.length == 0 ? 0 : wobjects.reduce((maxObj, obj) => {
+                    return obj.z > maxObj.z ? obj : maxObj;
+                }, wobjects[0]).z + 1,
+                networkId: null,
+                wobject: wobject,
+            }
+        }));
+    }
 
     useLayoutEffect(() => {
         if (wobjects.some(wobject => wobject.currentWidth == 0)) {
@@ -243,6 +319,8 @@ function Whiteboard(props: WhiteboardProps) {
                     // Left
                     if (e.target == backPanel.current) {
                         setRightClickMenu(null);
+
+                        sync(wobjects);
                     }
                 }
 

@@ -1,6 +1,8 @@
 import React, { useEffect, useLayoutEffect } from 'react';
 import { useState } from 'react'
 
+import { useQuery, QueryKey, QueryClient, QueryClientProvider } from '@tanstack/react-query';
+
 import { WhiteboardMetadataGET } from './api/ApiTypes.ts'
 
 interface ChooseWhiteboardMenuProps {
@@ -16,6 +18,8 @@ function ChooseWhiteboardMenu(props: ChooseWhiteboardMenuProps) {
     useEffect(() => {
         if (props.needToReload) {
             // Get whiteboards created by user
+            props.setNeedToReload(false);
+
             fetch(
                 `${import.meta.env.VITE_BASE_URL}/whiteboards`,
                 {
@@ -25,9 +29,9 @@ function ChooseWhiteboardMenu(props: ChooseWhiteboardMenuProps) {
                     }),
                     credentials: 'include',
                 }
-            ).then((res) =>
-                res.json(),
-            ).then((res: WhiteboardMetadataGET[]) => {
+            ).then((res) => {
+                return res.json();
+            }).then((res: WhiteboardMetadataGET[]) => {
                 if (res.length == 0) {
                     props.setNeedToCreate(true);
                 } else {
@@ -35,7 +39,8 @@ function ChooseWhiteboardMenu(props: ChooseWhiteboardMenuProps) {
                 }
 
                 setLoadedWhiteboards(res);
-                props.setNeedToReload(false);
+            }).catch((e) => {
+                console.log(e);
             });
         }
     }, [props.needToReload]);

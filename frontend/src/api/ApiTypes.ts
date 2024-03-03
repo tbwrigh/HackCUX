@@ -1,3 +1,5 @@
+import {CreatedWobject} from '../wobjects/Wobject';
+
 export interface WhiteboardMetadataGET {
   id: number;
   name: string;
@@ -12,11 +14,5 @@ export interface CreateWobjectPOST {
 }
 
 export interface WhiteboardObjectsGET {
-  creator_id: number, data: {
-    type: string,
-    text: string,
-    x: number,
-    y: number,
-  }[],
-      id: number, whiteboard_id: number,
+  creator_id: number, data: CreatedWobject, id: number, whiteboard_id: number,
 }
