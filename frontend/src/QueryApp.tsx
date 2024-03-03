@@ -28,7 +28,7 @@ function QueryApp() {
   const { isLoading, isError, data } = useQuery<boolean, boolean, WhiteboardMetadata[]>({
     queryKey: ['GET', 'whiteboards'],
   });
-  const whiteboards = data.map((w) => <Whiteboard id={w.id} />);
+  // const whiteboards = data.map((w) => <Whiteboard id={w.id} />);
 
   if (isLoading) return <div>Loading...</div>;
   if (data == undefined || isError) return <div>Error fetching whiteboards!</div>;
@@ -61,13 +61,13 @@ function QueryApp() {
       {isPopupOpen && (
         /* to darken background, need to have element covering entire screen with transparent black background */
         <div className="fixed w-full h-full bg-black/35 z-40">
-          <dialog open className="fixed inset-0 p-4 rounded-xl">
+          <dialog open className="fixed inset-0 p-4 rounded-xl w-96">
             <form onSubmit={makeWhiteboardOfName}>
               <h2 className="font-bold text-center">New Whiteboard</h2>
-              <input type="text" name="whiteboardName" className="block m-3 px-4 py-2 rounded-full bg-50 outline outline-1 outline-gray-200 focus:outline-none focus:ring focus:ring-blue-600" placeholder="Type a whiteboard name" autofocus />
-              <footer className="flex flex-row gap-2 basis-full">
-                <button onClick={closePopup} className="grow p-2 rounded-lg bg-gray-100">Cancel</button>
-                <button type="submit" className="grow p-2 rounded-lg bg-blue-600 text-gray-50">Save</button>
+              <input type="text" name="whiteboardName" className="block w-full my-3 px-4 py-2 rounded-full bg-50 outline outline-1 outline-gray-200 focus:outline-none focus:ring focus:ring-blue-600" placeholder="Type a whiteboard name" autoFocus />
+              <footer className="flex flex-row gap-3 justify-items-stretch">
+                <button onClick={closePopup} className="basis-full grow p-2 rounded-lg bg-gray-100">Cancel</button>
+                <button type="submit" className="basis-full grow p-2 rounded-lg bg-blue-600 text-gray-50">Save</button>
               </footer>
             </form>
           </dialog>
@@ -86,7 +86,7 @@ function QueryApp() {
             <HamburgerMenu whiteboardMetadatas={data} setIsPopupOpen={setIsPopupOpen} setSelectedWhiteboardID={setSelectedWhiteboardID} />
           </div>
           <div className="w-full h-full flex-1">
-            {whiteboards}
+            {/* whiteboards */}
           </div>
         </div>}
     </div>
