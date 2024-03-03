@@ -26,14 +26,7 @@ function QueryApp() {
   headers.append('Cookie', 'session_id='+session_id);
 
   const { isLoading, isError, data } = useQuery({
-    queryKey: ['repoData'],
-    queryFn: async () => fetch(
-        `${import.meta.env.VITE_BASE_URL}/whiteboards/`,
-        {
-          method: 'GET',
-          credentials: 'include',
-        }
-      ).then((res) => res.json())
+    queryKey: ['GET', 'whiteboards'],
   });
 
   if (isLoading) return <div>Loading...</div>;
