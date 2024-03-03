@@ -254,9 +254,8 @@ function Whiteboard(props: WhiteboardProps) {
                     key={wobject.id}
                     onMouseDown={(e) => onMouseDownElement(e, wobject.id)}
                     onMouseUp={(e) => onMouseUpElement(e, wobject.id)}
-                    className={`${wobject.currentWidth == 0 ? 'display-none' : ''} border-2`}
+                    className={`${wobject.currentWidth == 0 ? 'display-none' : ''} border border-1 border-gray-300 rounded-lg overflow-hidden`}
                     style={{
-                        backgroundColor: 'skyblue',
                         position: 'absolute',
                         cursor: 'grab',
                         overflow: 'hidden',
@@ -267,14 +266,14 @@ function Whiteboard(props: WhiteboardProps) {
                 >
 
                     <div className="border-none w-full h-full">
-                        <div className="w-full flex justify-between"
+                        <div className="w-full h-7 flex justify-between"
                             style={{
                                 userSelect: 'none'
                             }}
                         >
                             <span className="flex-1"></span>
-                            <i className="material-icons align-middle">fullscreen</i>
-                            <i className="material-icons align-middle">close</i>
+                            <i className="block material-icons align-middle text-[1.5rem] m-0.5">fullscreen</i>
+                            <i className="block material-icons align-middle text-[1.5rem] m-0.5">close</i>
                         </div>
                         {wobject.wobjectElement}
                     </div>
