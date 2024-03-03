@@ -67,7 +67,7 @@ function QueryApp() {
         <div className="fixed w-full h-full bg-black/35 z-40">
           <dialog open className="fixed inset-0 p-4 rounded-xl w-96">
             <form onSubmit={makeWhiteboardOfName}>
-              <h2 className="font-bold text-center">New Whiteboard</h2>
+              <h2 className="py-2 font-extrabold text-2xl text-center">New Whiteboard</h2>
               <input type="text" name="whiteboardName" className="block w-full my-3 px-4 py-2 rounded-full bg-50 outline outline-1 outline-gray-200 focus:outline-none focus:ring focus:ring-blue-600" placeholder="Type a whiteboard name" autoFocus />
               <footer className="flex flex-row gap-3 justify-items-stretch">
                 <button onClick={closePopup} className="basis-full grow p-2 rounded-lg bg-gray-100">Cancel</button>
