@@ -62,18 +62,6 @@ services:
         condition: service_started
       hackcu-memcached:
         condition: service_started
-  hackcu-frontend:
-    container_name: hackcu-frontend
-    build: 
-      context: ./frontend
-      dockerfile: Dockerfile
-    ports:
-      - 3000:3000
-    env_file:
-      - frontend.env
-    depends_on:
-      hackcu-backend:
-        condition: service_healthy
     
 volumes:
   hackcu-database-volume:
