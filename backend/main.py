@@ -125,13 +125,13 @@ def create_whiteboard(name: str, user: dict = Depends(get_authenticated_user_fro
         session.add(whiteboard)
         session.commit()
 
-    app.state.qdrant.create_collection(
-        collection_name=f"{whiteboard.name}-{whiteboard.id}",
-        vectors_config=models.VectorsConfig(
-            dimension=1024,
-            distance=models.Distance.euclidean,
+        app.state.qdrant.create_collection(
+            collection_name=f"{whiteboard.name}-{whiteboard.id}",
+            vectors_config=models.VectorsConfig(
+                dimension=1024,
+                distance=models.Distance.euclidean,
+            )
         )
-    )
 
     return {"message": "Whiteboard created successfully"}
 
@@ -147,10 +147,10 @@ def update_whiteboard(whiteboard_id: int, name: str, user: dict = Depends(get_au
         whiteboard.name = name
         session.commit()
 
-    app.state.qdrant.rename_collection(
-        old_collection_name=f"{whiteboard.name}-{whiteboard.id}",
-        new_collection_name=f"{name}-{whiteboard.id}"
-    )
+        app.state.qdrant.rename_collection(
+            old_collection_name=f"{whiteboard.name}-{whiteboard.id}",
+            new_collection_name=f"{name}-{whiteboard.id}"
+        )
 
     return {"message": "Whiteboard updated successfully"}
 
@@ -213,25 +213,25 @@ def create_whiteboard_object(whiteboard_id: int, data: dict = Body(...), user: d
         session.add(whiteboard_object)
         session.commit()
 
-    if "text" in data:
-        embeddings = get_embeddings(data["text"])
-        points = []
-        with app.state.db.session() as session:
-            for embedding in embeddings:
-                vector = Vector(whiteboard_object_id=whiteboard_object.id)
-                session.add(vector)
-                points.append(
-                    models.Point(
-                        id=vector.id,
-                        vector=embedding[0],
-                        payload={"text": embedding[1]}
+        if "text" in data:
+            embeddings = get_embeddings(data["text"])
+            points = []
+            with app.state.db.session() as session:
+                for embedding in embeddings:
+                    vector = Vector(whiteboard_object_id=whiteboard_object.id)
+                    session.add(vector)
+                    points.append(
+                        models.Point(
+                            id=vector.id,
+                            vector=embedding[0],
+                            payload={"text": embedding[1]}
+                        )
                     )
-                )
-            session.commit()
-        app.state.qdrant.upsert(
-            collection_name=f"{whiteboard.name}-{whiteboard.id}",
-            points=points
-        )
+                session.commit()
+            app.state.qdrant.upsert(
+                collection_name=f"{whiteboard.name}-{whiteboard.id}",
+                points=points
+            )
 
     return {"message": "Whiteboard object created successfully"}
 
@@ -261,26 +261,26 @@ def update_whiteboard_object(whiteboard_id: int, object_id: int, data: dict = Bo
                 ids=ids
             )
 
-    if "text" in data:
-        embeddings = get_embeddings(data["text"])
-        points = []
-        with app.state.db.session() as session:
-            for embedding in embeddings:
-                vector = Vector(whiteboard_object_id=whiteboard_object.id)
-                session.add(vector)
-                points.append(
-                    models.Point(
-                        id=vector.id,
-                        vector=embedding[0],
-                        payload={"text": embedding[1]}
+        if "text" in data:
+            embeddings = get_embeddings(data["text"])
+            points = []
+            with app.state.db.session() as session:
+                for embedding in embeddings:
+                    vector = Vector(whiteboard_object_id=whiteboard_object.id)
+                    session.add(vector)
+                    points.append(
+                        models.Point(
+                            id=vector.id,
+                            vector=embedding[0],
+                            payload={"text": embedding[1]}
+                        )
                     )
-                )
-            session.commit()
-        app.state.qdrant.upsert(
-            collection_name=f"{whiteboard.name}-{whiteboard.id}",
-            points=points
-        )
-    
+                session.commit()
+            app.state.qdrant.upsert(
+                collection_name=f"{whiteboard.name}-{whiteboard.id}",
+                points=points
+            )
+        
     return {"message": "Whiteboard object updated successfully"}
 
 @app.delete("/delete_whiteboard_object/{whiteboard_id}/{object_id}")
