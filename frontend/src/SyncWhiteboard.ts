@@ -8,7 +8,6 @@ class SyncWhiteboard {
   constructor(whiteboardId: number, wobjects: Wobject[]) {
     this.whiteboardId = whiteboardId;
 
-    /*
     setTimeout(() => {
       wobjects.forEach((wobject) => {
         if (!wobject.networkId) {
@@ -58,7 +57,6 @@ class SyncWhiteboard {
         }
       });
     }, 5000);
-    */
   }
 }
 

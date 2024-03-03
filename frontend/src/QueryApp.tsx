@@ -20,32 +20,55 @@ function QueryApp() {
   const [whiteboardID, setWhiteboardID] = useState<number | null>(null);
   const [needToCreate, setNeedToCreate] = useState<boolean>(false);
   const [needToReload, setNeedToReload] = useState<boolean>(true);
+  const [menuOpen, setMenuOpen] = useState<boolean>(true);
 
   return (
     <div className="flex h-screen">
-      <div className="w-64 bg-gray-800 text-white">
-        <ChooseWhiteboardMenu setWhiteboardID={setWhiteboardID} setNeedToCreate={setNeedToCreate} needToReload={needToReload} setNeedToReload={setNeedToReload} />
+      <div className="text-white" >
 
-        <button
-          type="submit"
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-lg focus:outline-none focus:shadow-outline transform transition-colors duration-150"
-          onClick={(event: React.MouseEvent) => {
-            setNeedToCreate(true);
-          }}>
-          Create
-        </button>
+        <div onClick={() => menuOpen ? setMenuOpen(false) : setMenuOpen(true)}
+          className='text-black'
+          style={{
+            top: "80px",
+            left: "80px",
+            cursor: "pointer",
+            zIndex: "1000",
+          }}
+        ><i className="material-icons text-4xl">menu</i></div>
+
+        <div
+          className='w-64'
+          style={{
+            transition: "transform 0.25s",
+            transform: menuOpen ? "translateX(0)" : "translateX(-100%)",
+          }}
+        >
+
+          <ChooseWhiteboardMenu setWhiteboardID={setWhiteboardID} setNeedToCreate={setNeedToCreate} needToReload={needToReload} setNeedToReload={setNeedToReload} />
+
+          <button
+            type="submit"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-lg focus:outline-none focus:shadow-outline transform transition-colors duration-150"
+            onClick={(event: React.MouseEvent) => {
+              setNeedToCreate(true);
+            }}>
+            Create
+          </button>
+        </div>
       </div>
 
-      {needToCreate ? (
-        <CreateWhiteboardMenu setWhiteboardID={setWhiteboardID} setNeedToCreate={setNeedToCreate} setNeedToReload={setNeedToReload} />
-      ) : (
-        <div></div>
-      )}
+      {
+        needToCreate ? (
+          <CreateWhiteboardMenu setWhiteboardID={setWhiteboardID} setNeedToCreate={setNeedToCreate} setNeedToReload={setNeedToReload} />
+        ) : (
+          <div></div>
+        )
+      }
 
-      <div className="flex-1 bg-gray-100 p-8">
+      <div className="flex-1 p-8">
         {whiteboardID ? <Whiteboard id={whiteboardID} /> : <div></div>}
       </div>
-    </div>
+    </div >
   )
 }
 

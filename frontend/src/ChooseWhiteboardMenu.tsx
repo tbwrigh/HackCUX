@@ -43,7 +43,7 @@ function ChooseWhiteboardMenu(props: ChooseWhiteboardMenuProps) {
     return loadedWhiteboards.map((whiteboard, i) => (
         <div key={i} className="mb-6">
             <span
-                className="block text-gray-200 text-lg font-bold mb-2"
+                className="block text-black text-lg font-bold mb-2"
                 onClick={(e) => {
                     props.setWhiteboardID(whiteboard.id);
                 }}>{whiteboard.name}</span>

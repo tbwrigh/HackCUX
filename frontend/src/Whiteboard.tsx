@@ -87,10 +87,6 @@ function Whiteboard(props: WhiteboardProps) {
         queryKey: ['GET', 'whiteboard_objects', props.id],
     });
 
-    useEffect(() => {
-        console.log(data);
-    }, [data]);
-
     // Class for automatically syncing
     const syncWhiteboard = new SyncWhiteboard(props.id, wobjects);
 

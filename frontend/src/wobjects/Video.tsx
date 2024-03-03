@@ -7,6 +7,8 @@ function VideoWobject(props: WobjectProps) {
     const videoId = props.wobject.fields.find(field => field.type == "code")?.value;
     const videoUrl = `https://www.youtube.com/embed/${videoId}`;
 
+    props.wobject.customData = videoId!;
+
     return (
         <div className="w-full h-full min-w-72" style={{
             position: 'relative',
