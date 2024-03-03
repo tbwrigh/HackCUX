@@ -129,7 +129,7 @@ def create_whiteboard(name: str, user: dict = Depends(get_authenticated_user_fro
             collection_name=f"{whiteboard.name}-{whiteboard.id}",
             vectors_config=models.VectorsConfig(
                 dimension=1024,
-                distance=models.Distance.euclidean,
+                distance=models.Distance.EUCLID,
             )
         )
 
