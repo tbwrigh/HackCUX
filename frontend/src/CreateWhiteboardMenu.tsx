@@ -45,7 +45,7 @@ function CreateWhiteboardMenu(props: CreateWhiteboardMenuProps) {
                     type="submit"
                     className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-lg focus:outline-none focus:shadow-outline transform transition-colors duration-150"
                     onClick={(event: React.MouseEvent) => {
-                        const chosenName = entries.find(entry => entry.type == "name")!.type;
+                        const chosenName = entries.find(entry => entry.type == "name")!.value;
 
                         // Create whiteboard in backend and return
                         fetch(
