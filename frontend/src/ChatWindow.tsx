@@ -18,7 +18,8 @@ function ChatWindow({WhiteboardIndex}: ChatWindowProps) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [isCollapsed, setIsCollapsed] = useState(true);
-
+  const [serverThinking, setServerThinking] = useState(false);
+  
   const fetchResponse = async (userMessage: string) => {
 
     const req_body: ChatReqBody = {
@@ -49,8 +50,11 @@ function ChatWindow({WhiteboardIndex}: ChatWindowProps) {
     setMessages(messages => [...messages, { text: userMessage, sender: 'user' }]);
     setInput(''); // Clear input field
 
+    setMessages(messages => [...messages, { text: '...', sender: 'server' }]);
+    setServerThinking(true);
     const response = await fetchResponse(userMessage);
-    setMessages(messages => [...messages, { text: response, sender: 'server' }]);
+    setMessages(messages => [...(messages.slice(0, -1)), { text: response, sender: 'server' }]);
+    setServerThinking(false);
   };
 
   return (
@@ -67,13 +71,13 @@ function ChatWindow({WhiteboardIndex}: ChatWindowProps) {
         <div className={`${isCollapsed ? 'hidden' : ''} transition-all duration-500 flex flex-col`}>
             <div className="h-64 overflow-y-auto">
                 {messages.map((message, index) => (
-                      <div key={index} className={`text-left m-2 p-2 rounded-lg ${message.sender === 'user' ? 'text-right bg-blue-600 text-white m-l-max' : 'bg-gray-200'}`}>
+                      <div key={index} className={`text-left m-2 p-2 rounded-lg ${message.sender === 'user' ? 'text-right bg-blue-600 text-white m-l-max' : 'bg-gray-200'} ${message.sender === 'server' && message.text === '...' ? 'animate-pulse' : ''}`}>
                       {message.text}
                       </div>
                 ))}
             </div>
             <input
-                className="mt-2 mb-2 shadow appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="mt-2 mb-2 shadow appearance-none border rounded-full w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => {
@@ -83,10 +87,11 @@ function ChatWindow({WhiteboardIndex}: ChatWindowProps) {
                     sendMessage();
                   }
                 }}
+                disabled={serverThinking}
             />
             <button
             onClick={sendMessage}
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded"
             >
                 Send
             </button>
