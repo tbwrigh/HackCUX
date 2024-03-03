@@ -20,6 +20,7 @@ interface Wobject {
     xStart: number;
     yStart: number;
     currentlyDragging: boolean;
+    selected: boolean;
     id: number;
     currentWidth: number;
     currentHeight: number;
@@ -88,6 +89,7 @@ const Whiteboard: React.FC = () => {
             xStart: 0,
             yStart: 0,
             currentlyDragging: false,
+            selected: false,
             id: Date.now(), // Use timestamp for unique id
             currentWidth: 0,
             currentHeight: 0,
@@ -110,10 +112,12 @@ const Whiteboard: React.FC = () => {
         //createNewWobject(e.clientX, e.clientY, "text");
     };
 
-    const handleDragStart = (e: React.MouseEvent, id: number) => {
+    const onMouseDownElement = (e: React.MouseEvent, id: number) => {
         setWobjects(wobjects.map((wobject) => {
             if (wobject.id == id) {
-                return { ...wobject, xStart: wobject.x, yStart: wobject.y, xMouseStart: e.clientX, yMouseStart: e.clientY, currentlyDragging: true };
+                return { ...wobject, xStart: wobject.x, yStart: wobject.y, xMouseStart: e.clientX, yMouseStart: e.clientY, currentlyDragging: true, selected: true };
+            } else {
+                return { ...wobject, selected: false };
             }
             return wobject;
         }));
@@ -130,7 +134,7 @@ const Whiteboard: React.FC = () => {
         return false;
     };
 
-    const handleDragEnd = (e: React.MouseEvent, id: number) => {
+    const onMouseUpElement = (e: React.MouseEvent, id: number) => {
         setWobjects(wobjects.map((wobject) => {
             if (wobject.id == id) {
                 return { ...wobject, x: wobject.xStart + e.clientX - wobject.xMouseStart, y: wobject.yStart + e.clientY - wobject.yMouseStart, currentlyDragging: false };
@@ -172,8 +176,8 @@ const Whiteboard: React.FC = () => {
                 <div
                     ref={wobject.ref}
                     key={wobject.id}
-                    onMouseDown={(e) => handleDragStart(e, wobject.id)}
-                    onMouseUp={(e) => handleDragEnd(e, wobject.id)}
+                    onMouseDown={(e) => onMouseDownElement(e, wobject.id)}
+                    onMouseUp={(e) => onMouseUpElement(e, wobject.id)}
                     className={`${wobject.currentWidth == 0 ? 'display-none' : ''}`}
                     style={{
                         width: 300,
