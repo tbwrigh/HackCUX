@@ -1,8 +1,10 @@
 import { useCookies } from 'react-cookie';
 import { useState } from 'react';
 import { Buffer } from "buffer";
+import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
+    const navigate = useNavigate();
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [cookies, setCookie] = useCookies(['session_id']);
@@ -11,6 +13,36 @@ const LoginPage = () => {
         e.preventDefault();
         doLogin(username, password, setCookie)
     };
+
+    
+    const doLogin = async (username: string, password: string, setCookie: any): Promise<void> => {
+        // const [cookies, setCookie] = useCookies(['session_id']);
+        const headers = new Headers();
+        headers.append("Authorization", "Basic " + Buffer.from(username + ":" + password, 'binary').toString('base64'));
+
+        try {
+            const response = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
+                headers: headers,
+                // credentials: 'include', // play nice with CORS
+                method: 'POST',
+            });
+
+            if (response.status !== 200) {
+                alert("Login failed!");
+                return;
+            }
+
+            const json = await response.json();
+
+            setCookie('session_id', json['session_id'].toString(), { path: '/', maxAge: 3600 * 24 });
+
+            navigate("../");
+
+        } catch (error) {
+            alert("Login failed!");
+            return;
+        }
+    }
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -55,30 +87,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-
-
-const doLogin = async (username: string, password: string, setCookie: any): Promise<void> => {
-    // const [cookies, setCookie] = useCookies(['session_id']);
-    const headers = new Headers();
-    headers.append("Authorization", "Basic " + Buffer.from(username + ":" + password, 'binary').toString('base64'));
-
-    try {
-        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
-            headers: headers,
-            // credentials: 'include', // play nice with CORS
-            method: 'POST',
-        });
-
-        if (response.status !== 200) {
-            alert("Login failed!");
-            return;
-        }
-
-        const json = await response.json();
-
-        setCookie('session_id', json['session_id'].toString(), { path: '/', maxAge: 3600 * 24 });
-    } catch (error) {
-        alert("Login failed!");
-        return;
-    }
-}
