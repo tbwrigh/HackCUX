@@ -127,7 +127,7 @@ def create_whiteboard(name: str, user: dict = Depends(get_authenticated_user_fro
 
         app.state.qdrant.create_collection(
             collection_name=f"{whiteboard.name}-{whiteboard.id}",
-            vectors_config=models.VectorsConfig(
+            vectors_config=models.VectorParams(
                 dimension=1024,
                 distance=models.Distance.EUCLID,
             )
