@@ -144,13 +144,26 @@ def update_whiteboard(whiteboard_id: int, name: str, user: dict = Depends(get_au
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="Whiteboard not found",
             )
+        
+        if whiteboard.name != name:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="New name is the same as the current name",
+            )
+
+        app.state.qdrant.create_collection(
+            collection_name=f"{name}-{whiteboard.id}",
+            vectors_config=models.VectorParams(
+                size=1024,
+                distance=models.Distance.EUCLID,
+            ),
+            init_from=models.InitFrom(collection=f"{whiteboard.name}-{whiteboard.id}")
+        )
+
+        app.state.qdrant.delete_collection(f"{whiteboard.name}-{whiteboard.id}")
+
         whiteboard.name = name
         session.commit()
-
-        app.state.qdrant.rename_collection(
-            old_collection_name=f"{whiteboard.name}-{whiteboard.id}",
-            new_collection_name=f"{name}-{whiteboard.id}"
-        )
 
     return {"message": "Whiteboard updated successfully"}
 
