@@ -33,9 +33,4 @@ export const WobjectTypes = [
   }
 ];
 
-// Base class
-export class BaseWobject<P extends {}> extends React.Component {
-  constructor(props: Readonly<P>|P) {
-    super(props);
-  }
-}
+export interface WobjectProps {}

@@ -3,11 +3,9 @@ import Editor, { DiffEditor, useMonaco, loader } from '@monaco-editor/react';
 
 import '../App.css'
 
-interface CodeWobjectProps {
+import { WobjectProps } from "./Wobject"
 
-}
-
-function CodeWobject(props: CodeWobjectProps) {
+function CodeWobject(props: WobjectProps) {
     return (
         <div>
             <Editor height="90vh" defaultLanguage="javascript" defaultValue="// some comment" />;

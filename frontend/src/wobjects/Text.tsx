@@ -6,11 +6,9 @@ import remarkMath from 'remark-math'
 
 import '../App.css'
 
-interface TextWobjectProps {
+import { WobjectProps } from "./Wobject"
 
-}
-
-function TextWobject(props: TextWobjectProps) {
+function TextWobject(props: WobjectProps) {
     const [content, setContent] = useState('');
     // true means editing and false means previewing
     const [editing, setEditing] = useState(true);

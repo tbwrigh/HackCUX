@@ -10,7 +10,7 @@ import WhiteboardMenu from './CreateWobjectMenu.tsx'
 
 import CodeWobject from './wobjects/Code.tsx'
 
-import { CreatedWobject, BaseWobject, WobjectTypes } from './wobjects/Wobject.ts'
+import { CreatedWobject, WobjectTypes } from './wobjects/Wobject.ts'
 
 interface Wobject {
     x: number;
