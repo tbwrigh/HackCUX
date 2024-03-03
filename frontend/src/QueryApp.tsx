@@ -50,21 +50,28 @@ function QueryApp() {
     <div>
       {isPopupOpen && (
         <dialog open>
-          <h2>Enter your name:</h2>
+          <h2>Enter the whiteboard name:</h2>
           <input type="text" />
           <button onClick={closePopup}>Save</button>
           <button onClick={closePopup}>Cancel</button>
         </dialog>
       )}
-      <div className="w-full h-full h-screen">
-        <div className="">
-          <ToolsSidebar selectedWobject={selectedWobject}/>
-          <HamburgerMenu whiteboardMetadatas={[]} setIsPopupOpen={setIsPopupOpen} />
-        </div>
-        <div className="w-full flex-1">
-          <Whiteboard />
-        </div>
-      </div>
+      {whiteboardMetadatas.length == 0 
+        ? 
+          <div> 
+            <p>Welcome! To begin, make your first whiteboard by clicking </p> 
+            <button onClick={() => setIsPopupOpen(true)}>here!</button> 
+          </div>
+        :
+          <div className="w-full h-full h-screen">
+            <div className="">
+              <ToolsSidebar selectedWobject={selectedWobject}/>
+              <HamburgerMenu whiteboardMetadatas={[]} setIsPopupOpen={setIsPopupOpen} />
+            </div>
+            <div className="w-full flex-1">
+              <Whiteboard />
+            </div>
+          </div>}
     </div>
   )
 }
