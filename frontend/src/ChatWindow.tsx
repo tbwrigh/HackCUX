@@ -65,7 +65,7 @@ function ChatWindow({WhiteboardIndex}: ChatWindowProps) {
         >
             <span className="underline mr-2">Chat</span>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`${isCollapsed ? '' : 'rotate-180'} transition duration-500 w-6 h-6`}>
-              <path fill-rule="evenodd" d="M11.47 7.72a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 1 1-1.06 1.06L12 9.31l-6.97 6.97a.75.75 0 0 1-1.06-1.06l7.5-7.5Z" clip-rule="evenodd" />
+              <path fillRule="evenodd" d="M11.47 7.72a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 1 1-1.06 1.06L12 9.31l-6.97 6.97a.75.75 0 0 1-1.06-1.06l7.5-7.5Z" clipRule="evenodd" />
             </svg>
         </button>
         <div className={`${isCollapsed ? 'hidden' : ''} transition-all duration-500 flex flex-col`}>

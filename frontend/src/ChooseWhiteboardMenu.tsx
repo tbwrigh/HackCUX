@@ -24,7 +24,7 @@ function ChooseWhiteboardMenu(props: ChooseWhiteboardMenuProps) {
             props.setNeedToReload(false);
 
             props.api.getWhiteboards((res) => {
-                console.log(res);
+                
                 if (res.length == 0) {
                     props.setNeedToCreate(true);
                 } else {
