@@ -34,7 +34,7 @@ function HamburgerMenu({ WhiteboardMetadataGETs, setIsPopupOpen, setSelectedWhit
             <WhiteboardItem key={item.id} id={item.id} label={item.name} setSelectedWhiteboardID={setSelectedWhiteboardID} />
           ))}
         </ul>
-        <button className='w-full px-4 py-2 bg-gray-300 rounded-xl' onClick={(onAddWhiteboardButtonPressed)}>Add Whiteboard</button>
+        <button className='w-full px-4 py-2 bg-gray-300 rounded-lg' onClick={(onAddWhiteboardButtonPressed)}>Add Whiteboard</button>
       </div>
     </div>
   );

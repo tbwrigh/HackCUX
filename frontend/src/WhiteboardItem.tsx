@@ -13,7 +13,7 @@ function WhiteboardItem({ id, label, setSelectedWhiteboardID }: WhiteboardItemPr
   }
 
   return (
-    <li onClick={onClick} className="px-4 py-2 hover:bg-[#fcfdfe] cursor-pointer transition rounded-xl">{label}</li>
+    <li onClick={onClick} className="px-4 py-2 hover:bg-[#fcfdfe] cursor-pointer transition rounded-lg">{label}</li>
   );
 }
 
