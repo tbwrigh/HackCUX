@@ -18,6 +18,8 @@ import { WhiteboardMetadataGET, WhiteboardObjectsGET } from './api/ApiTypes.ts'
 
 import ChatWindow from './ChatWindow.tsx'
 
+import { Api } from './api/Api.ts'
+
 interface RightClickMenu {
     x: number;
     y: number;
@@ -69,6 +71,7 @@ const EnsureMaximumSizeWobject = (w: number, h: number) => {
 
 interface WhiteboardProps {
     id: number;
+    api: Api;
 }
 
 function Whiteboard(props: WhiteboardProps) {
@@ -81,101 +84,50 @@ function Whiteboard(props: WhiteboardProps) {
 
     const backPanel = useRef<HTMLDivElement>(null);
 
-    const { isLoading, isError, data } = useQuery<boolean, boolean, WhiteboardObjectsGET[]>({
-        queryKey: ['GET', 'whiteboard_objects', props.id],
-    });
-
     function sync(wobjects: Wobject[]) {
-        console.log("SYNC!!")
-        wobjects.forEach((w) => {
-            if (!w.networkId) {
-                console.log(w);
-                fetch(
-                    `${import.meta.env.VITE_BASE_URL}/new_whiteboard_object/${props.id}/`,
-                    {
-                        method: 'POST',
-                        headers: new Headers({
-                            'Content-Type': 'application/json',
-                        }),
-                        credentials: 'include',
-                        body: JSON.stringify({
-                            data: w.wobject,
-                        }),
-                    })
-                    .then((res) => res.json())
-                    .then((data: { id: number }) => {
-                        w.networkId = data.id;
-                    });
-            } else {
-                console.log(w);
-                fetch(
-                    `${import.meta.env.VITE_BASE_URL}/update_whiteboard_object/${props.id}/${w.networkId}/`,
-                    {
-                        method: 'PUT',
-                        headers: new Headers({
-                            'Content-Type': 'application/json',
-                        }),
-                        credentials: 'include',
-                        body: JSON.stringify({
-                            data: w.wobject,
-                        }),
-                    })
-                    .then((res) => res.json())
-                    .then((data) => {
-                        console.log(data);
-                    });
-            }
-        });
+        props.api.syncWobjects(wobjects, props.id);
     }
 
-    if (data && data.length > 0 && wobjects.length == 0) {
-        const startingID = Date.now();
+    useEffect(() => {
+        props.api.getWhiteboardObjects(props.id, (data: WhiteboardObjectsGET[]) => {
+            console.log("sdjhhgdsjhjkdshgjdshk")
+            const startingID = Date.now();
 
-        setWobjects(data.map((data, i) => {
-            const wobject = data.data;
+            setWobjects(data.map((data, i) => {
+                const wobject = data.data;
 
-            const chosenWobject = WobjectTypes.find(w => w.type == wobject.type)!;
+                const chosenWobject = WobjectTypes.find(w => w.type == wobject.type)!;
 
-            return {
-                type: wobject.type,
-                x: wobject.x,
-                y: wobject.y,
-                xMouseStart: 0,
-                yMouseStart: 0,
-                xStart: 0,
-                yStart: 0,
-                currentlyDragging: false,
-                xMouseStartExtending: 0,
-                yMouseStartExtending: 0,
-                xStartExtending: 0,
-                yStartExtending: 0,
-                currentlyExtending: false,
-                selected: false,
-                id: startingID + i,
-                currentWidth: 0,
-                currentHeight: 0,
-                ref: React.createRef(),
-                extendingRef: React.createRef(),
-                wobjectElement: React.createElement(chosenWobject.class, { wobject }),
-                z: wobjects.length == 0 ? 0 : wobjects.reduce((maxObj, obj) => {
-                    return obj.z > maxObj.z ? obj : maxObj;
-                }, wobjects[0]).z + 1,
-                networkId: null,
-                wobject: wobject,
-            }
-        }));
-    }
-
-    useLayoutEffect(() => {
-        if (wobjects.some(wobject => wobject.currentWidth == 0)) {
-            setWobjects(wobjects.map((wobject) => {
-                const { offsetWidth: width, offsetHeight: height } = wobject.ref.current!;
-                wobject.currentWidth = width;
-                wobject.currentHeight = height;
-                return wobject;
+                return {
+                    type: wobject.type,
+                    x: wobject.x,
+                    y: wobject.y,
+                    xMouseStart: 0,
+                    yMouseStart: 0,
+                    xStart: 0,
+                    yStart: 0,
+                    currentlyDragging: false,
+                    xMouseStartExtending: 0,
+                    yMouseStartExtending: 0,
+                    xStartExtending: 0,
+                    yStartExtending: 0,
+                    currentlyExtending: false,
+                    selected: false,
+                    id: startingID + i,
+                    currentWidth: 0,
+                    currentHeight: 0,
+                    ref: React.createRef(),
+                    extendingRef: React.createRef(),
+                    wobjectElement: React.createElement(chosenWobject.class, { wobject }),
+                    z: wobjects.length == 0 ? 0 : wobjects.reduce((maxObj, obj) => {
+                        return obj.z > maxObj.z ? obj : maxObj;
+                    }, wobjects[0]).z + 1,
+                    networkId: null,
+                    wobject: wobject,
+                }
             }));
-        }
-    }, [wobjects]);
+        });
+    }, []);
 
     function createNewWobject(wobject: CreatedWobject) {
         const chosenWobject = WobjectTypes.find(w => w.type == wobject.type)!;
@@ -208,6 +160,17 @@ function Whiteboard(props: WhiteboardProps) {
             wobject: wobject,
         }]);
     }
+
+    useLayoutEffect(() => {
+        if (wobjects.some(wobject => wobject.currentWidth == 0)) {
+            setWobjects(wobjects.map((wobject) => {
+                const { offsetWidth: width, offsetHeight: height } = wobject.ref.current!;
+                wobject.currentWidth = width;
+                wobject.currentHeight = height;
+                return wobject;
+            }));
+        }
+    }, [wobjects]);
 
     useEffect(() => {
         if (createdWobject) {
@@ -303,7 +266,7 @@ function Whiteboard(props: WhiteboardProps) {
                 }
             }
             return wobject;
-            
+
         }));
     };
 
@@ -338,62 +301,55 @@ function Whiteboard(props: WhiteboardProps) {
         });
     };
 
-    if (isLoading) return <LoadingElement />
-    if (data == undefined || isError) return <div>Error fetching whiteboards!</div>;
-
     return (
         <>
-            {isLoading || isError ? (
-                <div>Ah rip</div>
-            ) : (
-                <div ref={backPanel} onMouseMove={handleDrag} onClickCapture={handleClick} onContextMenu={handleContextMenu} className="w-full h-full border-none">
-                    {wobjects.map((wobject) => (
-                        <div
-                            ref={wobject.ref}
-                            key={wobject.id}
-                            onMouseDown={(e) => onMouseDownElement(e, wobject.id)}
-                            onMouseUp={(e) => onMouseUpElement(e, wobject.id)}
-                            onMouseLeave={(e) => onMouseLeaveElement(e, wobject.id)}
-                            className={`${wobject.currentWidth == 0 ? 'display-none' : ''} border border-1 border-gray-300 rounded-lg overflow-hidden`}
-                            style={{
-                                position: 'absolute',
-                                cursor: 'grab',
-                                overflow: 'hidden',
-                                left: wobject.x - wobject.currentWidth / 2,
-                                top: wobject.y - wobject.currentHeight / 2,
-                                zIndex: wobject.z,
-                            }}
-                        >
+            <div ref={backPanel} onMouseMove={handleDrag} onClickCapture={handleClick} onContextMenu={handleContextMenu} className="w-full h-full border-none">
+                {wobjects.map((wobject) => (
+                    <div
+                        ref={wobject.ref}
+                        key={wobject.id}
+                        onMouseDown={(e) => onMouseDownElement(e, wobject.id)}
+                        onMouseUp={(e) => onMouseUpElement(e, wobject.id)}
+                        onMouseLeave={(e) => onMouseLeaveElement(e, wobject.id)}
+                        className={`${wobject.currentWidth == 0 ? 'display-none' : ''} border border-1 border-gray-300 rounded-lg overflow-hidden`}
+                        style={{
+                            position: 'absolute',
+                            cursor: 'grab',
+                            overflow: 'hidden',
+                            left: wobject.x - wobject.currentWidth / 2,
+                            top: wobject.y - wobject.currentHeight / 2,
+                            zIndex: wobject.z,
+                        }}
+                    >
 
-                            <div className="border-none w-full h-full">
-                                <div className="w-full flex justify-between"
-                                    style={{
-                                        userSelect: 'none'
-                                    }}
-                                >
-                                    <span className="flex-1"></span>
-                                    <i className="block material-icons align-middle text-[1.5rem] m-0.5">fullscreen</i>
-                                    <i className="block material-icons align-middle text-[1.5rem] m-0.5">close</i>
-                                </div>
-                                {wobject.wobjectElement}
-                            </div>
-
-                            <div
-                                ref={wobject.extendingRef}
-                                className='bg-transparent hover:bg-gray-100'
+                        <div className="border-none w-full h-full">
+                            <div className="w-full flex justify-between"
                                 style={{
-                                    position: "absolute",
-                                    width: "20px",
-                                    height: "20px",
-                                    right: 0,
-                                    bottom: 0,
-                                }} />
+                                    userSelect: 'none'
+                                }}
+                            >
+                                <span className="flex-1"></span>
+                                <i className="block material-icons align-middle text-[1.5rem] m-0.5">fullscreen</i>
+                                <i className="block material-icons align-middle text-[1.5rem] m-0.5">close</i>
+                            </div>
+                            {wobject.wobjectElement}
                         </div>
-                    ))
-                    }
-                    {rightClickMenu ? <WhiteboardMenu x={rightClickMenu.x} y={rightClickMenu.y} setCreatedWobject={setCreatedWobject} /> : <div></div>}
-                </div>
-            )}
+
+                        <div
+                            ref={wobject.extendingRef}
+                            className='bg-transparent hover:bg-gray-100'
+                            style={{
+                                position: "absolute",
+                                width: "20px",
+                                height: "20px",
+                                right: 0,
+                                bottom: 0,
+                            }} />
+                    </div>
+                ))
+                }
+                {rightClickMenu ? <WhiteboardMenu x={rightClickMenu.x} y={rightClickMenu.y} setCreatedWobject={setCreatedWobject} /> : <div></div>}
+            </div>
         </>
     );
 };

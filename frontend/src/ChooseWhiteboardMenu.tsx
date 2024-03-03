@@ -5,11 +5,14 @@ import { useQuery, QueryKey, QueryClient, QueryClientProvider } from '@tanstack/
 
 import { WhiteboardMetadataGET } from './api/ApiTypes.ts'
 
+import { Api } from './api/Api.ts'
+
 interface ChooseWhiteboardMenuProps {
     setWhiteboardID: React.Dispatch<React.SetStateAction<number | null>>;
     setNeedToCreate: React.Dispatch<React.SetStateAction<boolean>>;
     needToReload: boolean;
     setNeedToReload: React.Dispatch<React.SetStateAction<boolean>>;
+    api: Api;
 }
 
 function ChooseWhiteboardMenu(props: ChooseWhiteboardMenuProps) {
@@ -20,18 +23,7 @@ function ChooseWhiteboardMenu(props: ChooseWhiteboardMenuProps) {
             // Get whiteboards created by user
             props.setNeedToReload(false);
 
-            fetch(
-                `${import.meta.env.VITE_BASE_URL}/whiteboards`,
-                {
-                    method: 'GET',
-                    headers: new Headers({
-                        'Content-Type': 'application/json',
-                    }),
-                    credentials: 'include',
-                }
-            ).then((res) => {
-                return res.json();
-            }).then((res: WhiteboardMetadataGET[]) => {
+            props.api.getWhiteboards((res) => {
                 if (res.length == 0) {
                     props.setNeedToCreate(true);
                 } else {
@@ -39,9 +31,7 @@ function ChooseWhiteboardMenu(props: ChooseWhiteboardMenuProps) {
                 }
 
                 setLoadedWhiteboards(res);
-            }).catch((e) => {
-                console.log(e);
-            });
+            })
         }
     }, [props.needToReload]);
 

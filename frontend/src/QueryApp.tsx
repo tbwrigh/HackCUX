@@ -13,7 +13,11 @@ import AddWhiteboardPopup from './AddWhiteboardPopup.tsx'
 import ChooseWhiteboardMenu from './ChooseWhiteboardMenu'
 import CreateWhiteboardMenu from './CreateWhiteboardMenu'
 
+import { Api } from './api/Api.ts'
+
 function QueryApp() {
+  const api = new Api();
+
   const [cookies, setCookie] = useCookies(['session_id']);
   const session_id = cookies.session_id;
 
@@ -44,7 +48,7 @@ function QueryApp() {
           }}
         >
 
-          <ChooseWhiteboardMenu setWhiteboardID={setWhiteboardID} setNeedToCreate={setNeedToCreate} needToReload={needToReload} setNeedToReload={setNeedToReload} />
+          <ChooseWhiteboardMenu setWhiteboardID={setWhiteboardID} setNeedToCreate={setNeedToCreate} needToReload={needToReload} setNeedToReload={setNeedToReload} api={api} />
 
           <button
             type="submit"
@@ -66,7 +70,7 @@ function QueryApp() {
       }
 
       <div className="flex-1 p-8">
-        {whiteboardID ? <Whiteboard id={whiteboardID} /> : <div></div>}
+        {whiteboardID ? <Whiteboard id={whiteboardID} api={api} /> : <div></div>}
       </div>
     </div >
   )
