@@ -4,7 +4,7 @@ import WhiteboardItem from './WhiteboardItem';
 import { WhiteboardMetadata } from './WhiteboardMetadata';
 
 interface HamburgerMenuProps {
-  whiteboardMetadatas: WhiteboardMetadata[]; // Array of MenuItem objects
+  whiteboardMetadatas: WhiteboardMetadata[];
 }
 
 function HamburgerMenu({ whiteboardMetadatas }: HamburgerMenuProps) {
@@ -14,35 +14,13 @@ function HamburgerMenu({ whiteboardMetadatas }: HamburgerMenuProps) {
     setIsOpen(!isOpen);
   };
 
-
-  /*
-  return (
-    <>
-      <div className="app">
-      <div className={`menu-toggle ${isOpen ? 'open' : ''}`} onClick={toggleMenu}>
-        <div className="hamburger"></div>
-      </div>
-      <div className={`menu ${isOpen ? 'open' : ''}`}>
-          <div className='menu_items'>
-              <ul>
-                  {whiteboardMetadatas.map(item => (
-                      <WhiteboardItem key={item.id} label={item.name} />
-                  ))}
-              </ul>
-          </div>
-      </div>
-    </div>
-    </>
-  )
-  */
-
   return (
     <>
       <div>
-        <div className={`${isOpen ? '' : 'display-none'}`} onClick={toggleMenu}>
+        <div className={`${isOpen ? 'open' : ''}`} onClick={toggleMenu}>
           <i className="large material-icons">menu</i>
         </div>
-        <div className={`${isOpen ? '' : 'display-none'}`}>
+        <div className={`${isOpen ? 'open' : ''}`}>
           <div>
             <ul>
               {whiteboardMetadatas.map(item => (
@@ -50,7 +28,9 @@ function HamburgerMenu({ whiteboardMetadatas }: HamburgerMenuProps) {
               ))}
             </ul>
           </div>
+          <button>+</button>
         </div>
+        
       </div>
     </>
   )

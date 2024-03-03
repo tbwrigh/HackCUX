@@ -39,7 +39,7 @@ function QueryApp() {
       <div className="w-full h-full h-screen flex flex-row">
         <div className="flex-none">
           <ToolsSidebar />
-          {/*<HamburgerMenu whiteboardMetadatas={whiteboardMetadatas} />*/}
+          <HamburgerMenu whiteboardMetadatas={[]} />
         </div>
         <div className="w-full flex-1">
           <Whiteboard />
