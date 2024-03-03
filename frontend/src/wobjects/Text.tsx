@@ -19,7 +19,10 @@ function TextWobject(props: WobjectProps) {
                 <textarea
                     autoFocus
                     value={content}
-                    onChange={e => setContent(e.target.value)}
+                    onChange={e => {
+                        props.wobject.customData = e.target.value;
+                        setContent(e.target.value)
+                    }}
                     onFocus={() => setEditing(true)}
                     onBlur={() => setEditing(false)}
                     onKeyDown={(e) => {
