@@ -16,6 +16,8 @@ import { CreatedWobject, WobjectTypes, Wobject } from './wobjects/Wobject.ts'
 
 import { WhiteboardMetadataGET } from './api/ApiTypes.ts'
 
+import ChatWindow from './ChatWindow.tsx'
+
 import SyncWhiteboard from './SyncWhiteboard.ts'
 
 interface RightClickMenu {
@@ -292,6 +294,7 @@ function Whiteboard(props: WhiteboardProps) {
             ))
             }
             {rightClickMenu ? <WhiteboardMenu x={rightClickMenu.x} y={rightClickMenu.y} setCreatedWobject={setCreatedWobject} /> : <div></div>}
+            <ChatWindow WhiteboardIndex={props.id}/>
         </div>
     );
 };
