@@ -28,10 +28,6 @@ services:
     depends_on:
       hackcu-postgres:
         condition: service_healthy
-    develop:
-      watch:
-        - action: rebuild
-          path: ./backend/alembic/
   hackcu-qdrant:
     container_name: hackcu-qdrant
     image: qdrant/qdrant
