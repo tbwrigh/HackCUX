@@ -28,6 +28,7 @@ function QueryApp() {
   const { isLoading, isError, data } = useQuery<boolean, boolean, WhiteboardMetadata[]>({
     queryKey: ['GET', 'whiteboards'],
   });
+  const whiteboards = data.map((w) => <Whiteboard id={w.id} />);
 
   if (isLoading) return <div>Loading...</div>;
   if (data == undefined || isError) return <div>Error fetching whiteboards!</div>;
@@ -85,7 +86,7 @@ function QueryApp() {
             <HamburgerMenu whiteboardMetadatas={data} setIsPopupOpen={setIsPopupOpen} setSelectedWhiteboardID={setSelectedWhiteboardID} />
           </div>
           <div className="w-full h-full flex-1">
-            <Whiteboard id={0} />
+            {whiteboards}
           </div>
         </div>}
     </div>
