@@ -5,9 +5,11 @@ import { Buffer } from "buffer";
 const LoginPage = () => {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
+    const [cookies, setCookie] = useCookies(['session_id']);
 
-    const handleLogin = async () => {
-        doLogin(username, password)
+    const handleLogin = async (e: React.FormEvent) => {
+        e.preventDefault();
+        doLogin(username, password, setCookie)
     };
 
     return (
@@ -55,14 +57,15 @@ const LoginPage = () => {
 export default LoginPage;
 
 
-const doLogin = async (username: string, password: string): Promise<void> => {
-    const [cookies, setCookie] = useCookies(['session_id']);
+const doLogin = async (username: string, password: string, setCookie: Any): Promise<void> => {
+    // const [cookies, setCookie] = useCookies(['session_id']);
     const headers = new Headers();
     headers.append("Authorization", "Basic " + Buffer.from(username + ":" + password, 'binary').toString('base64'));
 
     try {
-        const response = await fetch('${process.env.BASE_URL}/login', {
+        const response = await fetch(`${import.meta.env.VITE_BASE_URL}/login`, {
             headers: headers,
+            // credentials: 'include', // play nice with CORS
             method: 'POST',
         });
 

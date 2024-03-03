@@ -20,7 +20,10 @@ function WhiteboardMenu(props: CreateWobjectProps) {
         >
             <ul className="text-sm text-gray-700">
                 {WobjectTypes.map((option) => (
-                    <li className="px-4 py-2 bg-gray-100 cursor-pointer" onClick={(e) => handleClick(e, option.type)}>{option.label}</li>
+                    <li className="px-4 py-2 bg-gray-100 cursor-pointer text-lg flex justify-between w-full" onClick={(e) => handleClick(e, option.type)}>
+                        <span>{option.label}</span>
+                        <i className="material-icons align-middle">{option.icon}</i>
+                    </li>
                 ))}
             </ul>
         </div>
