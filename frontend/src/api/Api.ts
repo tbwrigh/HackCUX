@@ -6,10 +6,9 @@ export class Api {
   constructor() {}
 
   syncWobjects(wobjects: Wobject[], whiteboardID: number) {
-    console.log(wobjects);
     wobjects.forEach((w) => {
       if (!w.networkId) {
-        console.log(w);
+        w.networkId = 1;
         fetch(
             `${import.meta.env.VITE_BASE_URL}/new_whiteboard_object/${
                 whiteboardID}/`,
@@ -27,8 +26,7 @@ export class Api {
             .then((data: {id: number}) => {
               w.networkId = data.id;
             });
-      } else {
-        console.log(w);
+      } else if (w.networkId != 1) {
         fetch(
             `${import.meta.env.VITE_BASE_URL}/update_whiteboard_object/${
                 whiteboardID}/${w.networkId}/`,

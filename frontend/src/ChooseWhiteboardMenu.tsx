@@ -24,6 +24,7 @@ function ChooseWhiteboardMenu(props: ChooseWhiteboardMenuProps) {
             props.setNeedToReload(false);
 
             props.api.getWhiteboards((res) => {
+                console.log(res);
                 if (res.length == 0) {
                     props.setNeedToCreate(true);
                 } else {
@@ -38,17 +39,17 @@ function ChooseWhiteboardMenu(props: ChooseWhiteboardMenuProps) {
     return (
         <>
             <ul className="flex flex-col gap-2">
-            {loadedWhiteboards.map((whiteboard, i) => (
-                <li
-                    key={i}
-                    className="px-4 py-2 hover:bg-[#fcfdfe] cursor-pointer transition rounded-lg"
-                    onClick={(e) => {
-                        props.setWhiteboardID(whiteboard.id);
-                    }}
-                >
-                    {whiteboard.name}
-                </li>
-            ))}
+                {loadedWhiteboards.map((whiteboard, i) => (
+                    <li
+                        key={i}
+                        className="px-4 py-2 hover:bg-[#fcfdfe] cursor-pointer transition rounded-lg"
+                        onClick={(e) => {
+                            props.setWhiteboardID(whiteboard.id);
+                        }}
+                    >
+                        {whiteboard.name}
+                    </li>
+                ))}
             </ul>
         </>
     );

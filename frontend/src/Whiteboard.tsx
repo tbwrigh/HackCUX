@@ -86,7 +86,6 @@ function Whiteboard(props: WhiteboardProps) {
 
     useEffect(() => {
         props.api.getWhiteboardObjects(props.id, (data: WhiteboardObjectsGET[]) => {
-            console.log("sdjhhgdsjhjkdshgjdshk")
             const startingID = Date.now();
 
             setWobjects(data.map((data, i) => {
@@ -118,12 +117,12 @@ function Whiteboard(props: WhiteboardProps) {
                     z: wobjects.length == 0 ? 0 : wobjects.reduce((maxObj, obj) => {
                         return obj.z > maxObj.z ? obj : maxObj;
                     }, wobjects[0]).z + 1,
-                    networkId: null,
+                    networkId: data.id,
                     wobject: wobject,
                 }
             }));
         });
-    }, []);
+    }, [props.id]);
 
     function createNewWobject(wobject: CreatedWobject) {
         const chosenWobject = WobjectTypes.find(w => w.type == wobject.type)!;
@@ -341,12 +340,12 @@ function Whiteboard(props: WhiteboardProps) {
                                 right: 0,
                                 bottom: 0,
                             }} />
-                        </div>
+                    </div>
                 ))
                 }
                 {rightClickMenu ? <WhiteboardMenu x={rightClickMenu.x} y={rightClickMenu.y} setCreatedWobject={setCreatedWobject} /> : <div></div>}
             </div>
-            <ChatWindow WhiteboardIndex={props.id}/>
+            <ChatWindow WhiteboardIndex={props.id} />
         </>
     );
 };

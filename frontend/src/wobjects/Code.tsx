@@ -19,7 +19,7 @@ function CodeWobject(props: WobjectProps) {
             defaultLanguage={props.wobject.fields.find(field => field.type == "lang")?.value}
             defaultValue="// Type some JS code here... with intellisense!"
             options={{
-                fontSize: 20,
+                fontSize: 15,
             }}
         />
     );
