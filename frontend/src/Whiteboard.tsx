@@ -345,11 +345,12 @@ function Whiteboard(props: WhiteboardProps) {
                                 right: 0,
                                 bottom: 0,
                             }} />
-                    </div>
+                        </div>
                 ))
                 }
                 {rightClickMenu ? <WhiteboardMenu x={rightClickMenu.x} y={rightClickMenu.y} setCreatedWobject={setCreatedWobject} /> : <div></div>}
             </div>
+            <ChatWindow WhiteboardIndex={props.id}/>
         </>
     );
 };

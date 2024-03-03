@@ -35,15 +35,22 @@ function ChooseWhiteboardMenu(props: ChooseWhiteboardMenuProps) {
         }
     }, [props.needToReload]);
 
-    return loadedWhiteboards.map((whiteboard, i) => (
-        <div key={i} className="mb-6">
-            <span
-                className="block text-black text-lg font-bold mb-2"
-                onClick={(e) => {
-                    props.setWhiteboardID(whiteboard.id);
-                }}>{whiteboard.name}</span>
-        </div>
-    )
+    return (
+        <>
+            <ul className="flex flex-col gap-2">
+            {loadedWhiteboards.map((whiteboard, i) => (
+                <li
+                    key={i}
+                    className="px-4 py-2 hover:bg-[#fcfdfe] cursor-pointer transition rounded-lg"
+                    onClick={(e) => {
+                        props.setWhiteboardID(whiteboard.id);
+                    }}
+                >
+                    {whiteboard.name}
+                </li>
+            ))}
+            </ul>
+        </>
     );
 }
 

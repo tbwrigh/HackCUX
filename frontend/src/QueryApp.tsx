@@ -28,37 +28,35 @@ function QueryApp() {
 
   return (
     <div className="flex h-screen">
-      <div className="text-white" >
 
-        <div onClick={() => menuOpen ? setMenuOpen(false) : setMenuOpen(true)}
-          className='text-black'
-          style={{
-            top: "80px",
-            left: "80px",
-            cursor: "pointer",
-            zIndex: "1000",
-          }}
-        ><i className="material-icons text-4xl">menu</i></div>
+      <div onClick={() => menuOpen ? setMenuOpen(false) : setMenuOpen(true)}
+        className='text-black'
+        style={{
+          position: "fixed",
+          top: "20px",
+          left: "20px",
+          cursor: "pointer",
+          zIndex: "1000",
+        }}
+      ><i className="material-icons text-4xl">menu</i></div>
 
-        <div
-          className='w-64'
-          style={{
-            transition: "transform 0.25s",
-            transform: menuOpen ? "translateX(0)" : "translateX(-100%)",
-          }}
-        >
+      <div
+        className='fixed top-0 left-0 w-64 h-full z-50 flex flex-col place-content-between bg-gray-100 p-2 pt-20 transition duration-250'
+        style={{
+          transform: menuOpen ? "translateX(0)" : "translateX(-100%)",
+        }}
+      >
 
           <ChooseWhiteboardMenu setWhiteboardID={setWhiteboardID} setNeedToCreate={setNeedToCreate} needToReload={needToReload} setNeedToReload={setNeedToReload} api={api} />
 
-          <button
-            type="submit"
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-lg focus:outline-none focus:shadow-outline transform transition-colors duration-150"
-            onClick={(event: React.MouseEvent) => {
-              setNeedToCreate(true);
-            }}>
-            Create
-          </button>
-        </div>
+        <button
+          type="submit"
+          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-lg focus:outline-none focus:shadow-outline transform transition-colors duration-150"
+          onClick={(event: React.MouseEvent) => {
+            setNeedToCreate(true);
+          }}>
+          Create
+        </button>
       </div>
 
       {
