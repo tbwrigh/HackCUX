@@ -3,14 +3,16 @@ import DeleteTool from './SidebarTools/DeleteTool';
 import './App.css'
 
 interface ToolsSidebarProps {
+  whiteboardID: number;
   selectedWobject: (null | number);
 }
 
 export interface ToolProps {
+  whiteboardID: number;
   selectedWobject: (null | number);
 }
 
-function ToolsSidebar({selectedWobject}: ToolsSidebarProps) {
+function ToolsSidebar({whiteboardID, selectedWobject}: ToolsSidebarProps) {
 
   return (
     <>
@@ -21,7 +23,7 @@ function ToolsSidebar({selectedWobject}: ToolsSidebarProps) {
           } w-1/8 h-3/6 bg-gray-200 text-gray-800 py-6 transition-transform duration-300`}
         >
         <ul>
-          <DeleteTool selectedWobject={selectedWobject}/>
+          <DeleteTool whiteboardID={whiteboardID} selectedWobject={selectedWobject}/>
         </ul>
       </div>
     </>

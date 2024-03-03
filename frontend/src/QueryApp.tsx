@@ -15,7 +15,7 @@ function QueryApp() {
   const [cookies, setCookie] = useCookies(['session_id']);
   const session_id = cookies.session_id;
   
-  const [count, setCount] = useState(0)
+  const [selectedWhiteboardID, setSelectedWhiteboardID] = useState(0)
   const [isPopupOpen, setIsPopupOpen] = useState(false);
 
   const [selectedWobject, setSelectedWobject] = useState(null);
@@ -25,12 +25,12 @@ function QueryApp() {
   headers.append('Content-Type', 'application/json');
   headers.append('Cookie', 'session_id='+session_id);
 
-  const { isLoading, isError, data } = useQuery({
+  const { isLoading, isError, data } = useQuery<boolean, boolean, WhiteboardMetadata[]>({
     queryKey: ['GET', 'whiteboards'],
   });
 
   if (isLoading) return <div>Loading...</div>;
-  if (isError) return <div>Error fetching whiteboards!</div>;
+  if (data == undefined || isError) return <div>Error fetching whiteboards!</div>;
 
   const closePopup = () => {
     setIsPopupOpen(false);
@@ -38,7 +38,7 @@ function QueryApp() {
 
   const makeWhiteboardOfName = (e: React.FormEvent) => {
     e.preventDefault();
-    const whiteboardName = Object.fromEntries((new FormData(e.target)).entries()).whiteboardName;
+    const whiteboardName = Object.fromEntries((new FormData(e.target as HTMLFormElement)).entries()).whiteboardName;
     console.log(whiteboardName);
     fetch(
       `${import.meta.env.VITE_BASE_URL}/new_whiteboard/${whiteboardName}`,
@@ -76,8 +76,8 @@ function QueryApp() {
         :
           <div className="w-full h-full h-screen">
             <div className="">
-              <ToolsSidebar selectedWobject={selectedWobject}/>
-              <HamburgerMenu whiteboardMetadatas={data} setIsPopupOpen={setIsPopupOpen} />
+              <ToolsSidebar whiteboardID={selectedWhiteboardID} selectedWobject={selectedWobject}/>
+              <HamburgerMenu whiteboardMetadatas={data} setIsPopupOpen={setIsPopupOpen} setSelectedWhiteboardID={setSelectedWhiteboardID} />
             </div>
             <div className="w-full flex-1">
               <Whiteboard />

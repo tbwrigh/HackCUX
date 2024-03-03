@@ -7,9 +7,10 @@ import { WobjectProps } from './wobjects/Wobject';
 interface HamburgerMenuProps {
   whiteboardMetadatas: WhiteboardMetadata[];
   setIsPopupOpen: (arg0: boolean) => void;
+  setSelectedWhiteboardID: (arg0: number) => void;
 }
 
-function HamburgerMenu({whiteboardMetadatas, setIsPopupOpen}: HamburgerMenuProps) {
+function HamburgerMenu({whiteboardMetadatas, setIsPopupOpen, setSelectedWhiteboardID}: HamburgerMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleMenu = () => {
@@ -28,7 +29,7 @@ function HamburgerMenu({whiteboardMetadatas, setIsPopupOpen}: HamburgerMenuProps
       <div className={`menu ${isOpen ? 'open' : ''}`}>
         <ul>
           {whiteboardMetadatas.map(item => (
-                <WhiteboardItem key={item.id} label={item.name} />
+                <WhiteboardItem key={item.id} id={item.id} label={item.name} setSelectedWhiteboardID={setSelectedWhiteboardID} />
               ))}
         </ul>
         <div>

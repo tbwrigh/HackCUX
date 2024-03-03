@@ -1,12 +1,19 @@
 import React from 'react';
 
 interface WhiteboardItemProps {
+  id: number,
   label: string;
+  setSelectedWhiteboardID: (arg0: number) => void;
 }
 
-function WhiteboardItem({ label }: WhiteboardItemProps) {
+function WhiteboardItem({ id, label, setSelectedWhiteboardID }: WhiteboardItemProps) {
+
+  const onClick = () => {
+    setSelectedWhiteboardID(id);
+  }
+
   return (
-    <li className="py-2">{label}</li>
+    <li onClick={onClick} className="py-2">{label}</li>
   );
 }
 

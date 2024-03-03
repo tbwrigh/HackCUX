@@ -1,12 +1,14 @@
 import { ToolProps } from '../ToolsSidebar'
 import './../App.css'
+import { useQuery, QueryKey, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 
 
-
-function DeleteTool({selectedWobject}: ToolProps) {
+function DeleteTool({whiteboardID, selectedWobject}: ToolProps) {
 
   const onClick = () => {
-    // remove packet for selectedWobject
+    const res = useQuery({
+      queryKey: ['DELETE', `delete_whiteboard_object/${whiteboardID}/${selectedWobject}`],
+    });
   }
 
   return (
