@@ -2,7 +2,7 @@ import React from 'react';
 
 import { CreateWobject } from "./Whiteboard"
 
-import './QueryApp.css'
+import './App.css'
 
 interface WhiteboardMenuProps {
     x: number;
