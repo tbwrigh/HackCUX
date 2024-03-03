@@ -1,11 +1,12 @@
 import {Wobject} from '../wobjects/Wobject.ts'
 
-import {WhiteboardObjectsGET} from './ApiTypes.ts'
+import {WhiteboardMetadataGET, WhiteboardObjectsGET} from './ApiTypes.ts'
 
 export class Api {
   constructor() {}
 
   syncWobjects(wobjects: Wobject[], whiteboardID: number) {
+    console.log(wobjects);
     wobjects.forEach((w) => {
       if (!w.networkId) {
         console.log(w);
@@ -19,7 +20,7 @@ export class Api {
               }),
               credentials: 'include',
               body: JSON.stringify({
-                data: w.wobject,
+                data: {...w.wobject, x: w.x, y: w.y},
               }),
             })
             .then((res) => res.json())
@@ -38,7 +39,7 @@ export class Api {
               }),
               credentials: 'include',
               body: JSON.stringify({
-                data: w.wobject,
+                data: {...w.wobject, x: w.x, y: w.y},
               }),
             })
             .then((res) => res.json())

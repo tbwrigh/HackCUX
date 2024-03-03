@@ -84,10 +84,6 @@ function Whiteboard(props: WhiteboardProps) {
 
     const backPanel = useRef<HTMLDivElement>(null);
 
-    function sync(wobjects: Wobject[]) {
-        props.api.syncWobjects(wobjects, props.id);
-    }
-
     useEffect(() => {
         props.api.getWhiteboardObjects(props.id, (data: WhiteboardObjectsGET[]) => {
             console.log("sdjhhgdsjhjkdshgjdshk")
@@ -283,7 +279,7 @@ function Whiteboard(props: WhiteboardProps) {
                     if (e.target == backPanel.current) {
                         setRightClickMenu(null);
 
-                        sync(wobjects);
+                        props.api.syncWobjects(wobjects, props.id);
                     }
                 }
 

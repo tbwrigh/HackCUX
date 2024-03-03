@@ -9,7 +9,7 @@ import '../App.css'
 import { WobjectProps } from "./Wobject"
 
 function TextWobject(props: WobjectProps) {
-    const [content, setContent] = useState('');
+    const [content, setContent] = useState(props.wobject.customData);
     // true means editing and false means previewing
     const [editing, setEditing] = useState(true);
 
