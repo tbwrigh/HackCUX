@@ -220,6 +220,21 @@ function Whiteboard(props: WhiteboardProps) {
         }));
     };
 
+    const onMouseLeaveElement = (e: React.MouseEvent, id: number) => {
+        setWobjects(wobjects.map((wobject) => {
+            if (wobject.id == id) {
+                if (wobject.currentlyDragging) {
+                    return { ...wobject, currentlyDragging: false };
+                }
+                else if (wobject.currentlyExtending) {
+                    return { ...wobject, currentlyExtending: false };
+                }
+            }
+            return wobject;
+            
+        }));
+    };
+
     const handleClick = useCallback((e: React.MouseEvent) => {
         if (clickTimeout) {
             clearTimeout(clickTimeout);
@@ -264,6 +279,7 @@ function Whiteboard(props: WhiteboardProps) {
                             key={wobject.id}
                             onMouseDown={(e) => onMouseDownElement(e, wobject.id)}
                             onMouseUp={(e) => onMouseUpElement(e, wobject.id)}
+                            onMouseLeave={(e) => onMouseLeaveElement(e, wobject.id)}
                             className={`${wobject.currentWidth == 0 ? 'display-none' : ''} border-2`}
                             style={{
                                 backgroundColor: 'skyblue',
