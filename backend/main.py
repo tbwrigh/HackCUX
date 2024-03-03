@@ -38,7 +38,7 @@ def startup_event():
     app.state.db = DB()
     app.state.cache = base.Client((getenv("MEMCACHE_HOST"), int(getenv("MEMCACHE_PORT"))))
     app.state.session_count = 1
-    app.state.qdrant = QdrantClient(host=getenv("QDRANT_HOST"), port=int(getenv("QDRANT_PORT")), prefer_grpc=True)
+    # app.state.qdrant = QdrantClient(host=getenv("QDRANT_HOST"), port=int(getenv("QDRANT_PORT")), prefer_grpc=True)
     app.state.cohere = cohere.Client(getenv("COHERE_API_KEY"))
 
 
@@ -125,13 +125,13 @@ def create_whiteboard(name: str, user: dict = Depends(get_authenticated_user_fro
         session.add(whiteboard)
         session.commit()
 
-        app.state.qdrant.create_collection(
-            collection_name=f"{whiteboard.name}-{whiteboard.id}",
-            vectors_config=models.VectorParams(
-                size=1024,
-                distance=models.Distance.EUCLID,
-            )
-        )
+        # app.state.qdrant.create_collection(
+        #     collection_name=f"{whiteboard.name}-{whiteboard.id}",
+        #     vectors_config=models.VectorParams(
+        #         size=1024,
+        #         distance=models.Distance.EUCLID,
+        #     )
+        # )
 
         return {"id": whiteboard.id}
 
@@ -151,16 +151,16 @@ def update_whiteboard(whiteboard_id: int, name: str, user: dict = Depends(get_au
                 detail="New name is the same as the current name",
             )
 
-        app.state.qdrant.create_collection(
-            collection_name=f"{name}-{whiteboard.id}",
-            vectors_config=models.VectorParams(
-                size=1024,
-                distance=models.Distance.EUCLID,
-            ),
-            init_from=models.InitFrom(collection=f"{whiteboard.name}-{whiteboard.id}")
-        )
+        # app.state.qdrant.create_collection(
+        #     collection_name=f"{name}-{whiteboard.id}",
+        #     vectors_config=models.VectorParams(
+        #         size=1024,
+        #         distance=models.Distance.EUCLID,
+        #     ),
+        #     init_from=models.InitFrom(collection=f"{whiteboard.name}-{whiteboard.id}")
+        # )
 
-        app.state.qdrant.delete_collection(f"{whiteboard.name}-{whiteboard.id}")
+        # app.state.qdrant.delete_collection(f"{whiteboard.name}-{whiteboard.id}")
 
         whiteboard.name = name
         session.commit()
@@ -172,7 +172,7 @@ def delete_whiteboard(whiteboard_id: int, user: dict = Depends(get_authenticated
     with app.state.db.session() as session:
         whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
 
-        app.state.qdrant.delete_collection(f"{whiteboard.name}-{whiteboard.id}")
+        # app.state.qdrant.delete_collection(f"{whiteboard.name}-{whiteboard.id}")
 
         if whiteboard is None or whiteboard.owner_id != user.id:
             raise HTTPException(
@@ -229,26 +229,26 @@ def create_whiteboard_object(whiteboard_id: int, data: dict = Body(...), user: d
         session.add(whiteboard_object)
         session.commit()
 
-        if "text" in data and data["text"] != "":
-            embeddings = get_embeddings(data["text"])
-            points = []
-            with app.state.db.session() as session:
-                for embedding in embeddings:
-                    vector = Vector(whiteboard_object_id=whiteboard_object.id)
-                    session.add(vector)
-                    session.flush()
-                    points.append(
-                        models.PointStruct(
-                            id=vector.id,
-                            vector=embedding[0],
-                            payload={"text": embedding[1]}
-                        )
-                    )
-                session.commit()
-            app.state.qdrant.upsert(
-                collection_name=f"{whiteboard.name}-{whiteboard.id}",
-                points=points
-            )
+        # if "text" in data and data["text"] != "":
+        #     embeddings = get_embeddings(data["text"])
+        #     points = []
+        #     with app.state.db.session() as session:
+        #         for embedding in embeddings:
+        #             vector = Vector(whiteboard_object_id=whiteboard_object.id)
+        #             session.add(vector)
+        #             session.flush()
+        #             points.append(
+        #                 models.PointStruct(
+        #                     id=vector.id,
+        #                     vector=embedding[0],
+        #                     payload={"text": embedding[1]}
+        #                 )
+        #             )
+        #         session.commit()
+        #     app.state.qdrant.upsert(
+        #         collection_name=f"{whiteboard.name}-{whiteboard.id}",
+        #         points=points
+        #     )
 
         return {"id": whiteboard_object.id}
 
@@ -271,36 +271,36 @@ def update_whiteboard_object(whiteboard_id: int, object_id: int, data: dict = Bo
         whiteboard_object.data = data
         session.commit()
 
-        vectors = session.query(Vector).filter(Vector.whiteboard_object_id == object_id).all()
-        ids = [vector.id for vector in vectors]
-        if len(ids) > 0:
-            app.state.qdrant.delete(
-                collection_name=f"{whiteboard.name}-{whiteboard.id}",
-                points_selector=models.PointIdsList(
-                    points=ids,
-                ),
-            )
+        # vectors = session.query(Vector).filter(Vector.whiteboard_object_id == object_id).all()
+        # ids = [vector.id for vector in vectors]
+        # if len(ids) > 0:
+        #     app.state.qdrant.delete(
+        #         collection_name=f"{whiteboard.name}-{whiteboard.id}",
+        #         points_selector=models.PointIdsList(
+        #             points=ids,
+        #         ),
+        #     )
 
-        if "text" in data and data["text"] != "":
-            embeddings = get_embeddings(data["text"])
-            points = []
-            with app.state.db.session() as session:
-                for embedding in embeddings:
-                    vector = Vector(whiteboard_object_id=whiteboard_object.id)
-                    session.add(vector)
-                    session.flush()
-                    points.append(
-                        models.PointStruct(
-                            id=vector.id,
-                            vector=embedding[0],
-                            payload={"text": embedding[1]}
-                        )
-                    )
-                session.commit()
-            app.state.qdrant.upsert(
-                collection_name=f"{whiteboard.name}-{whiteboard.id}",
-                points=points
-            )
+        # if "text" in data and data["text"] != "":
+        #     embeddings = get_embeddings(data["text"])
+        #     points = []
+        #     with app.state.db.session() as session:
+        #         for embedding in embeddings:
+        #             vector = Vector(whiteboard_object_id=whiteboard_object.id)
+        #             session.add(vector)
+        #             session.flush()
+        #             points.append(
+        #                 models.PointStruct(
+        #                     id=vector.id,
+        #                     vector=embedding[0],
+        #                     payload={"text": embedding[1]}
+        #                 )
+        #             )
+        #         session.commit()
+        #     app.state.qdrant.upsert(
+        #         collection_name=f"{whiteboard.name}-{whiteboard.id}",
+        #         points=points
+        #     )
         
     return {"message": "Whiteboard object updated successfully"}
 
@@ -321,123 +321,123 @@ def delete_whiteboard_object(whiteboard_id: int, object_id: int, user: dict = De
                 detail="Whiteboard object not found",
             )
         
-        vectors = session.query(Vector).filter(Vector.whiteboard_object_id == object_id).all()
-        ids = [vector.id for vector in vectors]
-        if len(ids) > 0:
-            app.state.qdrant.delete(
-                collection_name=f"{whiteboard.name}-{whiteboard.id}",
-                points_selector=models.PointIdsList(
-                    points=ids,
-                ),
-            )
+        # vectors = session.query(Vector).filter(Vector.whiteboard_object_id == object_id).all()
+        # ids = [vector.id for vector in vectors]
+        # if len(ids) > 0:
+        #     app.state.qdrant.delete(
+        #         collection_name=f"{whiteboard.name}-{whiteboard.id}",
+        #         points_selector=models.PointIdsList(
+        #             points=ids,
+        #         ),
+        #     )
 
         session.delete(whiteboard_object)
         session.commit()
     
     return {"message": "Whiteboard object deleted successfully"}
 
-@app.post("/search/{whiteboard_id}")
-def search(whiteboard_id: int, data: dict = Body(...), user: dict = Depends(get_authenticated_user_from_session_id)):
-    if "query" not in data:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Query not found",
-        )
-    query = data["query"]
-    with app.state.db.session() as session:
-        whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
-        if whiteboard is None or whiteboard.owner_id != user.id:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Whiteboard not found",
-            )
+# @app.post("/search/{whiteboard_id}")
+# def search(whiteboard_id: int, data: dict = Body(...), user: dict = Depends(get_authenticated_user_from_session_id)):
+#     if "query" not in data:
+#         raise HTTPException(
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             detail="Query not found",
+#         )
+#     query = data["query"]
+#     with app.state.db.session() as session:
+#         whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
+#         if whiteboard is None or whiteboard.owner_id != user.id:
+#             raise HTTPException(
+#                 status_code=status.HTTP_404_NOT_FOUND,
+#                 detail="Whiteboard not found",
+#             )
         
-        embeddings = get_embeddings(query)
+#         embeddings = get_embeddings(query)
         
-        vectors = []
+#         vectors = []
 
-        for embedding in embeddings:
-            vectors += app.state.qdrant.search(
-                collection_name=f"{whiteboard.name}-{whiteboard.id}",
-                query_vector=embedding[0],
-                limit=10
-            )
+#         for embedding in embeddings:
+#             vectors += app.state.qdrant.search(
+#                 collection_name=f"{whiteboard.name}-{whiteboard.id}",
+#                 query_vector=embedding[0],
+#                 limit=10
+#             )
     
-        return vectors
+#         return vectors
     
 
-@app.post("/chat/{whiteboard_id}")
-def chat_recieve_message(whiteboard_id: int, data: dict = Body(...), user: dict = Depends(get_authenticated_user_from_session_id)):
-    if "text" not in data:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Text not found",
-        )
+# @app.post("/chat/{whiteboard_id}")
+# def chat_recieve_message(whiteboard_id: int, data: dict = Body(...), user: dict = Depends(get_authenticated_user_from_session_id)):
+#     if "text" not in data:
+#         raise HTTPException(
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             detail="Text not found",
+#         )
     
-    with app.state.db.session() as session:
-        whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
-        if whiteboard is None or whiteboard.owner_id != user.id:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Whiteboard not found",
-            )
+#     with app.state.db.session() as session:
+#         whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
+#         if whiteboard is None or whiteboard.owner_id != user.id:
+#             raise HTTPException(
+#                 status_code=status.HTTP_404_NOT_FOUND,
+#                 detail="Whiteboard not found",
+#             )
 
-        embeddings = get_embeddings(data["text"])
-        vectors = []
+#         embeddings = get_embeddings(data["text"])
+#         vectors = []
 
-        for embedding in embeddings:
-            vectors += app.state.qdrant.search(
-                collection_name=f"{whiteboard.name}-{whiteboard.id}",
-                query_vector=embedding[0],
-                limit=2
-            )
+#         for embedding in embeddings:
+#             vectors += app.state.qdrant.search(
+#                 collection_name=f"{whiteboard.name}-{whiteboard.id}",
+#                 query_vector=embedding[0],
+#                 limit=2
+#             )
         
-        vectors = sorted(vectors, key=lambda x: x.score, reverse=True)
+#         vectors = sorted(vectors, key=lambda x: x.score, reverse=True)
 
-        vectors = vectors[:3]
+#         vectors = vectors[:3]
 
-        documents = [{"type": "document", "text": vector.payload["text"]} for vector in vectors]
+#         documents = [{"type": "document", "text": vector.payload["text"]} for vector in vectors]
 
-        if "message_history" in data:
-            documents += [{"type": "message", "text": message} for message in data["message_history"]]
+#         if "message_history" in data:
+#             documents += [{"type": "message", "text": message} for message in data["message_history"]]
 
-        resp = app.state.cohere.chat(
-            model="command",
-            message=data["text"],
-            documents=documents
-        )
+#         resp = app.state.cohere.chat(
+#             model="command",
+#             message=data["text"],
+#             documents=documents
+#         )
 
-        return {"response": resp.text}
+#         return {"response": resp.text}
     
-@app.post("/global_search")
-def execute_global_search(data: dict = Body(...), user: dict = Depends(get_authenticated_user_from_session_id)):
-    if "query" not in data:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Query not found",
-        )
-    query = data["query"]
-    with app.state.db.session() as session:
-        whiteboards = session.query(Whiteboard).filter(Whiteboard.owner_id == user.id).all()
-        pairs = []
-        embeddings = get_embeddings(query)
-        for whiteboard in whiteboards:
-            wb_score_min = 999999
-            for embedding in embeddings:
-                results = app.state.qdrant.search(
-                    collection_name=f"{whiteboard.name}-{whiteboard.id}",
-                    query_vector=embedding[0],
-                    limit=10
-                )
-                print(results)
-                if len(results) == 0:
-                    continue
-                min_score = min(results, key=lambda x: x.score).score
-                if min_score < wb_score_min:
-                    wb_score_min = min_score
+# @app.post("/global_search")
+# def execute_global_search(data: dict = Body(...), user: dict = Depends(get_authenticated_user_from_session_id)):
+#     if "query" not in data:
+#         raise HTTPException(
+#             status_code=status.HTTP_400_BAD_REQUEST,
+#             detail="Query not found",
+#         )
+#     query = data["query"]
+#     with app.state.db.session() as session:
+#         whiteboards = session.query(Whiteboard).filter(Whiteboard.owner_id == user.id).all()
+#         pairs = []
+#         embeddings = get_embeddings(query)
+#         for whiteboard in whiteboards:
+#             wb_score_min = 999999
+#             for embedding in embeddings:
+#                 results = app.state.qdrant.search(
+#                     collection_name=f"{whiteboard.name}-{whiteboard.id}",
+#                     query_vector=embedding[0],
+#                     limit=10
+#                 )
+#                 print(results)
+#                 if len(results) == 0:
+#                     continue
+#                 min_score = min(results, key=lambda x: x.score).score
+#                 if min_score < wb_score_min:
+#                     wb_score_min = min_score
                 
-            pairs.append({whiteboard.id: wb_score_min})
+#             pairs.append({whiteboard.id: wb_score_min})
       
-        pairs = sorted(pairs, key=lambda x: list(x.values())[0])
+#         pairs = sorted(pairs, key=lambda x: list(x.values())[0])
 
-        return pairs
+#         return pairs
