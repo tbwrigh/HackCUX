@@ -13,6 +13,8 @@ import CodeWobject from './wobjects/Code.tsx'
 import { CreatedWobject, WobjectTypes } from './wobjects/Wobject.ts'
 
 interface Wobject {
+    type: string,
+
     x: number;
     y: number;
     xMouseStart: number;
@@ -20,12 +22,21 @@ interface Wobject {
     xStart: number;
     yStart: number;
     currentlyDragging: boolean;
+
+    xMouseStartExtending: number;
+    yMouseStartExtending: number;
+    xStartExtending: number;
+    yStartExtending: number;
+    currentlyExtending: boolean;
+
     selected: boolean;
     id: number;
     currentWidth: number;
     currentHeight: number;
     ref: React.RefObject<HTMLDivElement>;
+    extendingRef: React.RefObject<HTMLDivElement>;
     wobject: React.ReactNode;
+    z: number;
 }
 
 interface RightClickMenu {
@@ -82,6 +93,7 @@ const Whiteboard: React.FC = () => {
         const chosenWobject = WobjectTypes.find(wobject => wobject.type == type)!;
 
         setWobjects([...wobjects, {
+            type: type,
             x: x,
             y: y,
             xMouseStart: 0,
@@ -89,12 +101,21 @@ const Whiteboard: React.FC = () => {
             xStart: 0,
             yStart: 0,
             currentlyDragging: false,
+            xMouseStartExtending: 0,
+            yMouseStartExtending: 0,
+            xStartExtending: 0,
+            yStartExtending: 0,
+            currentlyExtending: false,
             selected: false,
             id: Date.now(), // Use timestamp for unique id
             currentWidth: 0,
             currentHeight: 0,
             ref: React.createRef(),
+            extendingRef: React.createRef(),
             wobject: React.createElement(chosenWobject.class),
+            z: wobjects.length == 0 ? 0 : wobjects.reduce((maxObj, obj) => {
+                return obj.z > maxObj.z ? obj : maxObj;
+            }, wobjects[0]).z + 1
         }]);
     }
 
@@ -114,8 +135,14 @@ const Whiteboard: React.FC = () => {
 
     const onMouseDownElement = (e: React.MouseEvent, id: number) => {
         setWobjects(wobjects.map((wobject) => {
-            if (wobject.id == id) {
-                return { ...wobject, xStart: wobject.x, yStart: wobject.y, xMouseStart: e.clientX, yMouseStart: e.clientY, currentlyDragging: true, selected: true };
+            console.log(e.target, wobject.extendingRef.current!)
+            if (e.target == wobject.extendingRef.current!) {
+                return { ...wobject, xStartExtending: wobject.currentWidth, yStartExtending: wobject.currentHeight, xMouseStartExtending: e.clientX, yMouseStartExtending: e.clientY, currentlyExtending: true };
+            } else if (wobject.id == id) {
+                const newZ = wobjects.reduce((maxObj, obj) => {
+                    return obj.z > maxObj.z ? obj : maxObj;
+                }, wobjects[0]).z + 1;
+                return { ...wobject, xStart: wobject.x, yStart: wobject.y, xMouseStart: e.clientX, yMouseStart: e.clientY, currentlyDragging: true, selected: true, z: newZ };
             } else {
                 return { ...wobject, selected: false };
             }
@@ -125,9 +152,24 @@ const Whiteboard: React.FC = () => {
 
     const handleDrag = (e: React.MouseEvent) => {
         setWobjects(wobjects.map((wobject) => {
-            if (wobject.currentlyDragging) {
+            if (wobject.currentlyExtending) {
+                const newWidth = wobject.xStartExtending + (e.clientX - wobject.xMouseStartExtending) * 2;
+
+                // If the type is a video fix the aspect ratio
+                let newHeight = 0;
+                if (wobject.type == "video") {
+                    newHeight = wobject.currentHeight / wobject.currentWidth * newWidth;
+                } else {
+                    newHeight = wobject.yStartExtending + (e.clientY - wobject.yMouseStartExtending) * 2;
+                }
+
+                wobject.ref.current!.style.width = `${newWidth}px`;
+                wobject.ref.current!.style.height = `${newHeight}px`;
+                return { ...wobject, currentWidth: newWidth, currentHeight: newHeight };
+            } else if (wobject.currentlyDragging) {
                 return { ...wobject, x: wobject.xStart + e.clientX - wobject.xMouseStart, y: wobject.yStart + e.clientY - wobject.yMouseStart };
             }
+
             return wobject;
         }));
 
@@ -136,7 +178,19 @@ const Whiteboard: React.FC = () => {
 
     const onMouseUpElement = (e: React.MouseEvent, id: number) => {
         setWobjects(wobjects.map((wobject) => {
-            if (wobject.id == id) {
+            if (wobject.currentlyExtending) {
+                const newWidth = wobject.xStartExtending + (e.clientX - wobject.xMouseStartExtending) * 2;
+
+                // If the type is a video fix the aspect ratio
+                let newHeight = 0;
+                if (wobject.type == "video") {
+                    newHeight = wobject.currentHeight / wobject.currentWidth * newWidth;
+                } else {
+                    newHeight = wobject.yStartExtending + (e.clientY - wobject.yMouseStartExtending) * 2;
+                }
+
+                return { ...wobject, currentWidth: newWidth, currentHeight: newHeight, currentlyExtending: false };
+            } else if (wobject.currentlyDragging && wobject.id == id) {
                 return { ...wobject, x: wobject.xStart + e.clientX - wobject.xMouseStart, y: wobject.yStart + e.clientY - wobject.yMouseStart, currentlyDragging: false };
             }
             return wobject;
@@ -171,26 +225,35 @@ const Whiteboard: React.FC = () => {
     };
 
     return (
-        <div onMouseMove={handleDrag} onClickCapture={handleClick} onContextMenu={handleContextMenu} className="w-full h-full">
+        <div onMouseMove={handleDrag} onClickCapture={handleClick} onContextMenu={handleContextMenu} className="w-full h-full border-none">
             {wobjects.map((wobject) => (
                 <div
                     ref={wobject.ref}
                     key={wobject.id}
                     onMouseDown={(e) => onMouseDownElement(e, wobject.id)}
                     onMouseUp={(e) => onMouseUpElement(e, wobject.id)}
-                    className={`${wobject.currentWidth == 0 ? 'display-none' : ''}`}
+                    className={`${wobject.currentWidth == 0 ? 'display-none' : ''} border-2`}
                     style={{
-                        width: 300,
-                        height: 300,
                         backgroundColor: 'skyblue',
                         position: 'absolute',
                         cursor: 'grab',
                         overflow: 'hidden',
                         left: wobject.x - wobject.currentWidth / 2,
                         top: wobject.y - wobject.currentHeight / 2,
+                        zIndex: wobject.z,
                     }}
                 >
                     <Wobject>{wobject.wobject}</Wobject>
+                    <div
+                        ref={wobject.extendingRef}
+                        className='bg-transparent hover:bg-gray-100'
+                        style={{
+                            position: "absolute",
+                            width: "20px",
+                            height: "20px",
+                            right: 0,
+                            bottom: 0,
+                        }} />
                 </div>
             ))
             }

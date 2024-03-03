@@ -40,7 +40,7 @@ function TextWobject(props: WobjectProps) {
                     className="w-full h-full prose p-8 transition duration-500 hover:bg-gray-100"
                     onClick={() => setEditing(true)}
                 >
-                    <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeMathjax]}>{content}</Markdown>
+                    <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeMathjax]} className={"text-xl"}>{content}</Markdown>
                 </article>
             }
         </div>
