@@ -55,26 +55,34 @@ function ChatWindow({WhiteboardIndex}: ChatWindowProps) {
 
   return (
     <div id={`chat-window-${WhiteboardIndex}`} className="fixed bottom-0 right-0 mb-4 mr-4 max-w-xs p-4 bg-white rounded-lg shadow-lg">
-        <div className="flex flex-col">
-            <button
-                onClick={() => setIsCollapsed(!isCollapsed)}
-                className="mb-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded self-end"
-            >
-                {isCollapsed ? 'Show' : 'Hide'} Chat
-            </button>
-        </div>
+        <button
+            onClick={() => setIsCollapsed(!isCollapsed)}
+            className="block m-2 text-gray-800 self-end flex flex-row"
+        >
+            <span className="underline mr-2">Chat</span>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className={`${isCollapsed ? '' : 'rotate-180'} transition duration-500 w-6 h-6`}>
+              <path fill-rule="evenodd" d="M11.47 7.72a.75.75 0 0 1 1.06 0l7.5 7.5a.75.75 0 1 1-1.06 1.06L12 9.31l-6.97 6.97a.75.75 0 0 1-1.06-1.06l7.5-7.5Z" clip-rule="evenodd" />
+            </svg>
+        </button>
         <div className={`${isCollapsed ? 'hidden' : ''} transition-all duration-500 flex flex-col`}>
             <div className="h-64 overflow-y-auto">
                 {messages.map((message, index) => (
-                    <div key={index} className={`text-left ${message.sender === 'user' ? 'text-right' : ''}`}>
-                    {message.text}
-                    </div>
+                      <div key={index} className={`text-left m-2 p-2 rounded-lg ${message.sender === 'user' ? 'text-right bg-blue-600 text-white m-l-max' : 'bg-gray-200'}`}>
+                      {message.text}
+                      </div>
                 ))}
             </div>
             <input
-                className="mt-2 mb-2 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="mt-2 mb-2 shadow appearance-none border rounded-full w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => {
+                  // leave edit mode on pressing escape
+                  // (makes vim users happy)
+                  if (e.key == 'Enter') {
+                    sendMessage();
+                  }
+                }}
             />
             <button
             onClick={sendMessage}
