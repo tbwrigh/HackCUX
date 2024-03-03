@@ -79,7 +79,7 @@ function QueryApp() {
             <ToolsSidebar whiteboardID={selectedWhiteboardID} selectedWobject={selectedWobject} />
             <HamburgerMenu whiteboardMetadatas={data} setIsPopupOpen={setIsPopupOpen} setSelectedWhiteboardID={setSelectedWhiteboardID} />
           </div>
-          <div className="w-full flex-1">
+          <div className="w-full h-full flex-1">
             <Whiteboard />
           </div>
         </div>}
