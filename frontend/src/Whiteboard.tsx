@@ -68,7 +68,7 @@ const EnsureMaximumSizeWobject = (w: number, h: number) => {
 };
 
 interface WhiteboardProps {
-    id: number | null;
+    id: number;
 }
 
 function Whiteboard(props: WhiteboardProps) {
@@ -81,14 +81,9 @@ function Whiteboard(props: WhiteboardProps) {
 
     const backPanel = useRef<HTMLDivElement>(null);
 
-    let isLoading = false;
-    let isError = false;
-    let data = "";
-    if (props.id) {
-        ({ isLoading, isError, data } = useQuery<boolean, boolean, any>({
-            queryKey: ['GET', 'whiteboard_objects', props.id],
-        }));
-    }
+    const { isLoading, isError, data } = useQuery<boolean, boolean, any>({
+        queryKey: ['GET', 'whiteboard_objects', props.id],
+    });
 
     // Class for automatically syncing
     const syncWhiteboard = new SyncWhiteboard(props.id, wobjects);
