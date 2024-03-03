@@ -1,12 +1,21 @@
-export class WhiteboardMetadataGET {
+export interface WhiteboardMetadataGET {
   id: number = 0;
   name: string = '';
   owner_id: number = 0;
 }
 
-export class CreateWobjectPOST {
+export interface CreateWobjectPOST {
   data: {
     type: string|null,
     data: string|null,
-  } = {type: null, data: null}
+  }
+}
+
+export interface WhiteboardObjectsGET {
+  creator_id: number, data: {
+    text: string,
+    x: number,
+    y: number,
+  },
+      id: number, whiteboard_id: number,
 }

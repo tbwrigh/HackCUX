@@ -40,7 +40,7 @@ function TextWobject(props: WobjectProps) {
                 : null}
             {editing ? null :
                 <article
-                    className="w-full min-w-45 h-full min-h-10 prose-lg p-4 transition duration-500 hover:bg-gray-100"
+                    className="w-full h-full prose p-8 transition duration-500 hover:bg-gray-100 overflow-auto"
                     onClick={() => setEditing(true)}
                 >
                     <Markdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeMathjax]}>{content}</Markdown>

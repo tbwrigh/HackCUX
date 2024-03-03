@@ -408,3 +408,36 @@ def chat_recieve_message(whiteboard_id: int, data: dict = Body(...), user: dict 
         )
 
         return {"response": resp.text}
+    
+@app.post("/global_search")
+def execute_global_search(data: dict = Body(...), user: dict = Depends(get_authenticated_user_from_session_id)):
+    if "query" not in data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Query not found",
+        )
+    query = data["query"]
+    with app.state.db.session() as session:
+        whiteboards = session.query(Whiteboard).filter(Whiteboard.owner_id == user.id).all()
+        pairs = []
+        embeddings = get_embeddings(query)
+        for whiteboard in whiteboards:
+            wb_score_min = 999999
+            for embedding in embeddings:
+                results = app.state.qdrant.search(
+                    collection_name=f"{whiteboard.name}-{whiteboard.id}",
+                    query_vector=embedding[0],
+                    limit=10
+                )
+                print(results)
+                if len(results) == 0:
+                    continue
+                min_score = min(results, key=lambda x: x.score).score
+                if min_score < wb_score_min:
+                    wb_score_min = min_score
+                
+            pairs.append({whiteboard.id: wb_score_min})
+      
+        pairs = sorted(pairs, key=lambda x: list(x.values())[0])
+
+        return pairs
