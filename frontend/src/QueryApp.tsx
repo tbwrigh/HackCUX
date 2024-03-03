@@ -44,6 +44,8 @@ function QueryApp() {
     // TODO
   };
 
+  const [selectedWobject, setSelectedWobject] = useState(null)
+
   return (
     <div>
       {isPopupOpen && (
@@ -56,7 +58,7 @@ function QueryApp() {
       )}
       <div className="w-full h-full h-screen">
         <div className="">
-          <ToolsSidebar />
+          <ToolsSidebar selectedWobject={selectedWobject}/>
           <HamburgerMenu whiteboardMetadatas={[]} setIsPopupOpen={setIsPopupOpen} />
         </div>
         <div className="w-full flex-1">

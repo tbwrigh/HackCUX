@@ -1,6 +1,14 @@
+import { ToolProps } from '../ToolsSidebar'
 import './../App.css'
 
-function DeleteTool() {
+
+
+function DeleteTool({selectedWobject}: ToolProps) {
+
+  const onClick = () => {
+    // remove packet for selectedWobject
+  }
+
   return (
     <>
       <button className="inline-block w-18 h-18 p-2 bg-gray-200 hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-400 rounded">

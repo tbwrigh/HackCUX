@@ -2,6 +2,7 @@ import { useState } from 'react'
 import WhiteboardItem from './WhiteboardItem';
 import { WhiteboardMetadata } from './WhiteboardMetadata';
 import './HamburgerMenu.css';
+import { WobjectProps } from './wobjects/Wobject';
 
 interface HamburgerMenuProps {
   whiteboardMetadatas: WhiteboardMetadata[];

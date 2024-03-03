@@ -36,8 +36,8 @@ const LoginPage = () => {
 
                     <div className="flex items-center justify-between">
                         <div className="text-sm">
-                            <a href="#" className="font-medium text-indigo-600 hover:text-indigo-500">
-                                Forgot your password?
+                            <a href="/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
+                                Sign up!
                             </a>
                         </div>
                     </div>
@@ -57,7 +57,7 @@ const LoginPage = () => {
 export default LoginPage;
 
 
-const doLogin = async (username: string, password: string, setCookie: Any): Promise<void> => {
+const doLogin = async (username: string, password: string, setCookie: any): Promise<void> => {
     // const [cookies, setCookie] = useCookies(['session_id']);
     const headers = new Headers();
     headers.append("Authorization", "Basic " + Buffer.from(username + ":" + password, 'binary').toString('base64'));
