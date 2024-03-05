@@ -11,6 +11,7 @@ import cohere
 from dotenv import load_dotenv
 from os import getenv
 
+import asyncio
 import random
 
 from db import DB
@@ -215,8 +216,30 @@ def get_embeddings(text: str):
 
     return embed_pairs
 
+async def create_vectors(wbname, wbid, wboid, text):
+    embeddings = get_embeddings(text)
+    points = []
+    with app.state.db.session() as session:
+        for embedding in embeddings:
+            vector = Vector(whiteboard_object_id=wboid)
+            session.add(vector)
+            session.flush()
+            points.append(
+                models.PointStruct(
+                    id=vector.id,
+                    vector=embedding[0],
+                    payload={"text": embedding[1]}
+                )
+            )
+        session.commit()
+    app.state.qdrant.upsert(
+        collection_name=f"{wbname}-{wbid}",
+        points=points
+    )
+
+
 @app.post("/new_whiteboard_object/{whiteboard_id}")
-def create_whiteboard_object(whiteboard_id: int, data: dict = Body(...), user: dict = Depends(get_authenticated_user_from_session_id)):
+async def create_whiteboard_object(whiteboard_id: int, data: dict = Body(...), user: dict = Depends(get_authenticated_user_from_session_id)):
     data = data["data"]
     with app.state.db.session() as session:
         whiteboard = session.query(Whiteboard).filter(Whiteboard.id == whiteboard_id).first()
@@ -230,30 +253,20 @@ def create_whiteboard_object(whiteboard_id: int, data: dict = Body(...), user: d
         session.commit()
 
         if "customData" in data and data["customData"] != "":
-            embeddings = get_embeddings(data["customData"])
-            points = []
-            with app.state.db.session() as session:
-                for embedding in embeddings:
-                    vector = Vector(whiteboard_object_id=whiteboard_object.id)
-                    session.add(vector)
-                    session.flush()
-                    points.append(
-                        models.PointStruct(
-                            id=vector.id,
-                            vector=embedding[0],
-                            payload={"text": embedding[1]}
-                        )
-                    )
-                session.commit()
-            app.state.qdrant.upsert(
-                collection_name=f"{whiteboard.name}-{whiteboard.id}",
-                points=points
-            )
+            task = asyncio.create_task(create_vectors(whiteboard.name, whiteboard.id, whiteboard_object.id, data["customData"]))
 
         return {"id": whiteboard_object.id}
 
+async def remove_vectors(wbname, wbid, ids):
+    app.state.qdrant.delete(
+        collection_name=f"{wbname}-{wbid}",
+        points_selector=models.PointIdsList(
+            points=ids,
+        ),
+    )
+
 @app.put("/update_whiteboard_object/{whiteboard_id}/{object_id}")
-def update_whiteboard_object(whiteboard_id: int, object_id: int, data: dict = Body(...), user: dict = Depends(get_authenticated_user_from_session_id)):
+async def update_whiteboard_object(whiteboard_id: int, object_id: int, data: dict = Body(...), user: dict = Depends(get_authenticated_user_from_session_id)):
     data = data["data"]
 
     print(data)
@@ -277,33 +290,10 @@ def update_whiteboard_object(whiteboard_id: int, object_id: int, data: dict = Bo
         vectors = session.query(Vector).filter(Vector.whiteboard_object_id == object_id).all()
         ids = [vector.id for vector in vectors]
         if len(ids) > 0:
-            app.state.qdrant.delete(
-                collection_name=f"{whiteboard.name}-{whiteboard.id}",
-                points_selector=models.PointIdsList(
-                    points=ids,
-                ),
-            )
+            task = asyncio.create_task(remove_vectors(whiteboard.name, whiteboard.id, ids))
 
         if "customData" in data and data["customData"] != "":
-            embeddings = get_embeddings(data["customData"])
-            points = []
-            with app.state.db.session() as session:
-                for embedding in embeddings:
-                    vector = Vector(whiteboard_object_id=whiteboard_object.id)
-                    session.add(vector)
-                    session.flush()
-                    points.append(
-                        models.PointStruct(
-                            id=vector.id,
-                            vector=embedding[0],
-                            payload={"text": embedding[1]}
-                        )
-                    )
-                session.commit()
-            app.state.qdrant.upsert(
-                collection_name=f"{whiteboard.name}-{whiteboard.id}",
-                points=points
-            )
+            task = asyncio.create_task(create_vectors(whiteboard.name, whiteboard.id, whiteboard_object.id, data["customData"]))
         
     return {"message": "Whiteboard object updated successfully"}
 
@@ -327,12 +317,7 @@ def delete_whiteboard_object(whiteboard_id: int, object_id: int, user: dict = De
         vectors = session.query(Vector).filter(Vector.whiteboard_object_id == object_id).all()
         ids = [vector.id for vector in vectors]
         if len(ids) > 0:
-            app.state.qdrant.delete(
-                collection_name=f"{whiteboard.name}-{whiteboard.id}",
-                points_selector=models.PointIdsList(
-                    points=ids,
-                ),
-            )
+            task = asyncio.create_task(remove_vectors(whiteboard.name, whiteboard.id, ids))
 
         session.delete(whiteboard_object)
         session.commit()
